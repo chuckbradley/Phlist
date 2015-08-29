@@ -33,6 +33,7 @@ class Connectivity: NSObject {
             self.statusChangedWithReachability(internetReach!)
         }
 
+        // observe kReachabilityChangedNotification (defined in Reachability.h)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: kReachabilityChangedNotification, object: nil)
         
     }

@@ -13,7 +13,7 @@ import Parse
 
 class ListItem : NSManagedObject {
 
-    @NSManaged var parseID: String
+    @NSManaged var parseID: String?
     @NSManaged var name: String
     @NSManaged var searchText: String
     @NSManaged var active: Bool

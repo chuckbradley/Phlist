@@ -11,7 +11,8 @@ import UIKit
 import CoreData
 import Parse
 
-class ListItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate {
+
+class ListItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, ListItemCellDelegate {
 
     var list:List!
     let model = ModelController.one
@@ -31,30 +32,31 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
         self.title = list.title
         
-        populateListParseObject()
-        
-        fetchedResultsController.performFetch(nil)
-        
         fetchedResultsController.delegate = self
-
-//        println("ListView sections count = \(fetchedResultsController.sections?.count)")
 
         // temporary add-item UI
         buildAddNewItemUI()
 
-    }
-    
-    
-    func populateListParseObject() {
-        if list.parseObject == nil && connectivityStatus != NOT_REACHABLE && list.parseID != nil {
-            var query = PFQuery(className:"List")
-            query.getObjectInBackgroundWithId(list.parseID!) {
-                pfList, error in
-                if pfList != nil {
-                    self.list.parseObject = pfList!
+        model.assignParseObjectToList(list) {
+            success, pfList, error in
+            if pfList != nil {
+                // syncronize items with cloud
+                self.model.syncItemsInList(self.list) {
+                    success, error in // are parameters even needed?
+                    self.fetchedResultsController.performFetch(nil)
+                    self.tableView.reloadData()
                 }
+            } else {
+                // just use locally stored items
+                self.fetchedResultsController.performFetch(nil)
+                self.tableView.reloadData()
             }
         }
+    }
+
+
+    override func viewDidLayoutSubviews() {
+        addNewItemPanelDismisser!.cancelsTouchesInView = false
     }
     
 
@@ -64,26 +66,43 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow() {
-                let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
+//                let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
                 let destination = segue.destinationViewController as! DetailViewController
-                destination.detailItem = object
+//                destination.detailItem = object
+                let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+                destination.listItem = item
             }
         }
+        if segue.identifier == "showItemDetail" {
+            let destination = segue.destinationViewController as! DetailViewController
+            if let item = self.selectedItem {
+                destination.listItem = item
+            }
+//            destination.listItem = fetchedResultsController.fetchedObjects?[0] as? ListItem
+        }
     }
-    
+
+
     // MARK: - Table View
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-//        println("section count = \(self.fetchedResultsController.sections?.count)")
         return self.fetchedResultsController.sections?.count ?? 0
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        // assign title
-        // section.description returns "0" for Active and "1" for Archived
-        if section.description == "0" { return "Active" }
-        else { return "Archived" }
-        //        return section.description
+        var title = "Archived"
+
+        // section.description returns "0" for first and "1" for second
+        if section.description == "0" {
+            if let firstItem = fetchedResultsController.fetchedObjects?[0] as? ListItem {
+                if firstItem.active {
+                    title = "Active"
+                }
+            }
+        }
+        return title
+
+        // FYI:
         // let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
         // sectionInfo.indexTitle returns index of title ("A" for "Active", etc.)
         // sectionInfo.name returns value found by sectionNameKeyPath (activityState)
@@ -92,24 +111,42 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         // println("section.value = \(section.value) and section.description = \(section.description)")
         // println("section name = \(sectionInfo.name) and indexTitle = \(sectionInfo.indexTitle)")
     }
-    
+
+
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
-//        println("section \(section.description) number of rows = \(sectionInfo.numberOfObjects)")
         return sectionInfo.numberOfObjects
     }
-    
+
+
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-        self.configureCell(cell, atIndexPath: indexPath)
-        return cell
+        let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+        if listItem.active {
+            let cell = tableView.dequeueReusableCellWithIdentifier("ActiveCell", forIndexPath: indexPath) as! ActiveListItemCell
+            self.configureActiveCell(cell, atIndexPath: indexPath)
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCellWithIdentifier("ArchiveCell", forIndexPath: indexPath) as! ListItemCell
+            self.configureArchiveCell(cell, atIndexPath: indexPath)
+            return cell
+        }
     }
-    
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    
+
+//    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+//        // Return false if you do not want the specified item to be editable.
+//        return true
+//    }
+
+//    func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+//        println("willSelectRowAtIndexPath")
+//        return indexPath
+//    }
+
+//    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+//        println("didSelectRowAtIndexPath")
+//    }
+
+
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             let context = self.fetchedResultsController.managedObjectContext
@@ -125,16 +162,54 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
     
-    func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
-        cell.textLabel!.text = listItem.name
-        if !listItem.active {
-            cell.textLabel!.tintColor = UIColor.lightGrayColor()
-        }
+        if listItem.active { return 60.0 }
+        else { return 44.0 }
+    }
+
+    
+    func configureArchiveCell(cell: ListItemCell, atIndexPath indexPath: NSIndexPath) {
+        let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+        cell.nameButton.setTitle(listItem.name, forState: .Normal)
+        cell.nameButton.sizeToFit()
+        cell.listItem = listItem
+        cell.delegate = self
         // TODO: get image info
         
     }
+
+    func configureActiveCell(cell: ActiveListItemCell, atIndexPath indexPath: NSIndexPath) {
+        let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+        cell.nameButton.setTitle(listItem.name, forState: .Normal)
+        cell.listItem = listItem
+        cell.delegate = self
+        // TODO: get image info
+        
+    }
+
+
+    func nameTapped(item: ListItem) {
+        toggleItemActivation(item)
+    }
+
+    func toggleItemActivation(item: ListItem) {
+        if item.active { item.active = false }
+        else { item.active = true }
+        self.model.save()
+        tableView.reloadData()
+    }
     
+    var selectedItem:ListItem?
+    
+    func thumbnailTapped(item: ListItem) {
+        println("thumbnailTapped: item = \(item.name)")
+        selectedItem = item
+        performSegueWithIdentifier("showItemDetail", sender: self)
+
+    }
+    
+
     // MARK: - Fetched results controller
     
     lazy var fetchedResultsController: NSFetchedResultsController = {
@@ -142,12 +217,12 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         let fetchRequest = NSFetchRequest(entityName: "ListItem")
         
         // define sorting: first by active (for sectioning) then by creation date (within each section)
-        let activeDescriptor = NSSortDescriptor(key: "active", ascending: true)
-        let dateDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        let activeDescriptor = NSSortDescriptor(key: "active", ascending: false) // active then archived
+        let dateDescriptor = NSSortDescriptor(key: "creationDate", ascending: false) // first in, last out
         fetchRequest.sortDescriptors = [activeDescriptor, dateDescriptor]
         
-        let parentListPredicate = NSPredicate(format: "list == %@", self.list);
-        let noDeletedListPredicate = NSPredicate(format: "toBeDeleted == %@", false);
+        let parentListPredicate = NSPredicate(format: "list == %@", self.list) // only items in the parent list
+        let noDeletedListPredicate = NSPredicate(format: "toBeDeleted == %@", false) // don't include toBeDeleted
         let compoundPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([parentListPredicate, noDeletedListPredicate])
         
         fetchRequest.predicate = compoundPredicate
@@ -157,7 +232,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
             managedObjectContext: self.model.context,
             sectionNameKeyPath: "activityState",
             cacheName: nil)
-        
+
         return fetchedResultsController
         
         }()
@@ -186,7 +261,9 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         case .Delete:
             tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
         case .Update:
-            self.configureCell(tableView.cellForRowAtIndexPath(indexPath!)!, atIndexPath: indexPath!)
+            // TODO: add condition for active vs. archive
+//            self.configureCell(tableView.cellForRowAtIndexPath(indexPath!)!, atIndexPath: indexPath!)
+            println("updated object in section \(indexPath!.section), row \(indexPath!.row)")
         case .Move:
             tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
             tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
@@ -207,7 +284,6 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     self.tableView.reloadData()
     }
     */
-    
     
     
     
@@ -293,13 +369,14 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
                 self.dismissalPanel!.removeGestureRecognizer(self.addNewItemPanelDismisser!)
         })
     }
-    
-    
+
+
     func tapPlusButton(sender: AnyObject) {
         println("add button tapped")
         displayAddNewItemPanel()
     }
-    
+
+
     func tapAddNewItemButton(sender: AnyObject) {
         println("tapAddNewItemButton:")
         let newItemName = newItemNameField!.text
