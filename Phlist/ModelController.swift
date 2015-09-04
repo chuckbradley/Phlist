@@ -27,10 +27,11 @@ class ModelController {
 //    }
 
     static let one = ModelController()
-    
+
+    let domain = "com.freedommind.phlist"
+
     class func configParseWithOptions(launchOptions: [NSObject: AnyObject]?) {
-        // [Optional] Power your app with Local Datastore. For more info, go to
-        // https://parse.com/docs/ios_guide#localdatastore/iOS
+        // [Optional] Power your app with Local Datastore. For more info, go to https://parse.com/docs/ios_guide#localdatastore/iOS
         // Parse.enableLocalDatastore()
         
         // Initialize Parse.
@@ -41,7 +42,6 @@ class ModelController {
     }
 
 
-    // MARK: - instance properties & methods
 
     // MARK: - General
     
@@ -125,6 +125,22 @@ class ModelController {
         }
     }
     
+    func logout(viewController:UIViewController) {
+        // delete stored data
+        let lists = loadStoredLists()
+        for list in lists {
+            let items = loadStoredItemsForList(list)
+            for item in items {
+                context.deleteObject(item)
+                // TODO: delete associated photo, if any
+            }
+            context.deleteObject(list)
+        }
+        deleteUser()
+        // go to login screen
+        let controller = viewController.storyboard!.instantiateViewControllerWithIdentifier("Login") as! LoginViewController
+        viewController.presentViewController(controller, animated: true, completion: nil)
+    }
     
     
     
@@ -154,7 +170,8 @@ class ModelController {
                     // update List object with cloud data
                     list.parseID = pfList.objectId!
                     list.creationDate = pfList.createdAt!
-                    list.synchronizationDate = NSDate()
+                    list.updateModificationDate()
+                    list.updateSynchronizationDate()
                     self.save()
                 } else {
                     // TODO: handle saving-error
@@ -169,7 +186,8 @@ class ModelController {
                     // update List object with cloud data
                     list.parseID = pfList.objectId!
                     list.creationDate = pfList.createdAt!
-                    list.synchronizationDate = NSDate()
+                    list.updateModificationDate()
+                    list.updateSynchronizationDate()
                     self.save()
                 } else {
                     // TODO: handle saving-error
@@ -194,7 +212,8 @@ class ModelController {
             success, error in
             if success {
                 list.parseID = pfList.objectId!
-                list.synchronizationDate = NSDate()
+                list.updateModificationDate()
+                list.updateSynchronizationDate()
                 self.save()
             }
         }
@@ -210,8 +229,8 @@ class ModelController {
         } else {
             var newLists = [PFObject]()
             var dictionary = [String:PFObject]()
-            let cdLists = getStoredLists()
-            getParseLists {
+            let cdLists = loadStoredLists()
+            loadParseLists {
                 pfLists, error in
                 if error != nil {
                     // error - synchronization not possible
@@ -294,9 +313,9 @@ class ModelController {
     
 
     // retreive user's lists from cloud
-    func getParseLists(handler: (lists:[PFObject]?, error: NSError?)->Void) -> Void {
+    func loadParseLists(handler: (lists:[PFObject]?, error: NSError?)->Void) -> Void {
         if connectivityStatus == NOT_REACHABLE {
-            println("getParseLists error: connectivityStatus == NOT_REACHABLE")
+            println("loadParseLists error: connectivityStatus == NOT_REACHABLE")
             let error = NSError(domain: "com.freedommind.phlist", code: 100, userInfo: nil)
             handler(lists: nil, error: error)
         } else {
@@ -321,7 +340,7 @@ class ModelController {
 
 
     // retrieve lists from core data
-    func getStoredLists() -> [List] {
+    func loadStoredLists() -> [List] {
         let fetchRequest = NSFetchRequest(entityName:"List")
         
         var error: NSError?
@@ -367,13 +386,13 @@ class ModelController {
             if let acceptedBy = list["acceptedBy"] as? [String] {
                 if find(acceptedBy, self.user!.email) != nil {
                     let cdList = List(parseListObject: list, context: self.context)
-                    cdList.synchronizationDate = NSDate()
+                    cdList.updateSynchronizationDate()
                 } else {
                     // prompt user with invitation
                     // TODO: display a confirmation modal
                     // if yes, add list
                     let cdList = List(parseListObject: list, context: self.context)
-                    cdList.synchronizationDate = NSDate()
+                    cdList.updateSynchronizationDate()
                     // } else {
                     //     self.removeUserAsEditorFromObject(list)
                     // }
@@ -438,7 +457,7 @@ class ModelController {
                     println("item \"\(name)\" has been saved to list \(list.title) with id: \(pfItem.objectId!)")
                     item.parseID = pfItem.objectId!
                     item.creationDate = pfItem.createdAt!
-                    item.synchronizationDate = NSDate()
+                    item.updateSynchronizationDate()
                     self.save()
                 } else {
                     // TODO: handle saving-error
@@ -453,7 +472,7 @@ class ModelController {
                     println("item \"\(name)\" has been saved to list \(list.title) with id: \(pfItem.objectId!)")
                     item.parseID = pfItem.objectId!
                     item.creationDate = pfItem.createdAt!
-                    item.synchronizationDate = NSDate()
+                    item.updateSynchronizationDate()
                     self.save()
                 } else {
                     // TODO: handle saving-error
@@ -481,7 +500,8 @@ class ModelController {
             success, error in
             if success {
                 item.parseID = pfItem.objectId!
-                item.synchronizationDate = NSDate()
+                item.updateSynchronizationDate()
+                item.parseObject = pfItem
                 self.save()
             }
         }
@@ -492,14 +512,14 @@ class ModelController {
     func syncItemsInList(list: List, completionHandler: (success: Bool, error: NSError?) -> Void) {
         var newItems = [PFObject]()
         var dictionary = [String:PFObject]()
-        let cdItems = getStoredItemsForList(list)
+        let cdItems = loadStoredItemsForList(list)
         if connectivityStatus == NOT_REACHABLE {
             println("syncItemsInList error: connectivityStatus == NOT_REACHABLE")
             // TODO: learn about NSError
             let error = NSError(domain: self.domain, code: 100, userInfo: nil)
             completionHandler(success: false, error: error)
         } else {
-            getParseItemsForList(list) {
+            loadParseItemsForList(list) {
                 pfItems, error in
                 if error != nil {
                     // error - synchronization not possible
@@ -530,20 +550,21 @@ class ModelController {
                             dictionary[pfItem.objectId!] = pfItem
                         }
                         for item in cdItems {
-                            if item.parseID != nil {
+                            if item.parseID != nil { // if item has ever been synced...
                                 if let pfItem = dictionary.removeValueForKey(item.parseID!) {
                                     if (pfItem["deleted"] as! Bool) || item.toBeDeleted {
                                         pfItem["deleted"] = true
                                         self.removeUserAsEditorFromObject(pfItem)
                                         self.context.deleteObject(item)
                                     } else {
-                    // TODO: compare updates
+                                        item.parseObject = pfItem
+                    // TODO: compare update dates
                                     }
-                                } else {
+                                } else { // error case: once-synced local object exists but cloud doesn't
                                     self.context.deleteObject(item)
                                 }
                                 self.save()
-                            } else {
+                            } else { // item has never been synced...
                                 if item.toBeDeleted {
                                     self.context.deleteObject(item)
                                     self.save()
@@ -558,7 +579,7 @@ class ModelController {
                     }
                     for pfItem in newItems {
                         let item = ListItem(parseItemObject: pfItem, list: list, context: self.context)
-                        item.synchronizationDate = NSDate()
+                        item.updateSynchronizationDate()
                     }
                     self.save()
                     completionHandler(success: true, error: nil)
@@ -569,7 +590,7 @@ class ModelController {
 
 
     // retrieve local items for given list
-    func getStoredItemsForList(list: List) -> [ListItem] {
+    func loadStoredItemsForList(list: List) -> [ListItem] {
         let fetchRequest = NSFetchRequest(entityName: "ListItem")
         fetchRequest.predicate = NSPredicate(format: "list == %@", list);
         
@@ -586,9 +607,9 @@ class ModelController {
     
 
     // retreive cloud items for local list
-    func getParseItemsForList(list: List, handler: (items:[PFObject]?, error: NSError?) -> Void) {
+    func loadParseItemsForList(list: List, handler: (items:[PFObject]?, error: NSError?) -> Void) {
         if connectivityStatus == NOT_REACHABLE {
-            println("getParseLists error: connectivityStatus == NOT_REACHABLE")
+            println("loadParseLists error: connectivityStatus == NOT_REACHABLE")
             let error = NSError(domain: self.domain, code: 100, userInfo: nil)
             handler(items: nil, error: error)
         } else if let pfList = list.parseObject {
@@ -612,11 +633,58 @@ class ModelController {
     }
     
     
-    
+    // retrieve cloud item for local item
+    func loadParseItemForItem(item: ListItem, handler: (item: PFObject?, error: NSError?) -> Void) {
+        if let pfItem = item.parseObject {
+            handler(item: pfItem, error: nil)
+        } else if connectivityStatus == NOT_REACHABLE {
+            println("loadParseItemForItem error: connectivityStatus == NOT_REACHABLE")
+            let error = NSError(domain: self.domain, code: 100, userInfo: nil)
+            handler(item: nil, error: error)
+        } else if let id = item.parseID {
+            var query = PFQuery(className:"ListItem")
+            query.getObjectInBackgroundWithId(id) {
+                pfItem, error in
+                if pfItem != nil {
+                    item.parseObject = pfItem!
+                    handler(item: pfItem!, error: nil)
+                } else {
+                    handler(item: nil, error: error)
+                }
+            }
+        } else {
+            self.createParseListItemFromListItem(item)
+            handler(item: nil, error: nil)
+        }
+        
+    }
 
-    
-    
-    
+    func changeNameOfItem(item:ListItem, toName name:String) {
+        item.name = name
+        item.searchText = name.lowercaseString
+        item.updateModificationDate()
+        save()
+        if let pfItem = item.parseObject {
+            pfItem["name"] = name
+            pfItem.saveInBackgroundWithBlock {
+                success, error in
+                item.updateSynchronizationDate()
+                self.save()
+            }
+        } else {
+            loadParseItemForItem(item) {
+                pfItem, error in
+                if pfItem != nil {
+                    pfItem!["name"] = name
+                    pfItem!.saveInBackgroundWithBlock {
+                        success, error in
+                        item.updateSynchronizationDate()
+                        self.save()
+                    }
+                }
+            }
+        }
+    }
 
 
 
@@ -644,7 +712,6 @@ class ModelController {
         }
     }
 
-    let domain = "com.freedommind.phlist"
     
 //    class var lastListsUpdate: NSDate? {
 //        get {

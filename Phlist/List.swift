@@ -17,6 +17,7 @@ class List : NSManagedObject {
     @NSManaged var title: String
     @NSManaged var toBeDeleted: Bool
     @NSManaged var creationDate: NSDate
+    @NSManaged var modificationDate: NSDate
     @NSManaged var synchronizationDate: NSDate?
     @NSManaged var itemsSynchronizedAt: NSDate?
     @NSManaged var items: [ListItem]
@@ -39,8 +40,10 @@ class List : NSManagedObject {
         title = parseListObject["title"] as! String
         user = model.user!
         creationDate = parseListObject.createdAt!
+        modificationDate = NSDate()
         toBeDeleted = false
 
+        /* if items are added to parse object
         // if the parse list object has items, generate ListItem instances and add to array
         if let listItems = parseListObject["items"] as? [PFObject] {
             for item in listItems {
@@ -49,6 +52,8 @@ class List : NSManagedObject {
             }
         }
         self.itemsSynchronizedAt = NSDate()
+        */
+
         self.synchronizationDate = NSDate()
     }
     
@@ -63,6 +68,18 @@ class List : NSManagedObject {
         creationDate = NSDate()
         itemsSynchronizedAt = (NSDate.distantPast() as! NSDate)
         synchronizationDate = (NSDate.distantPast() as! NSDate)
+    }
+
+    func updateSynchronizationDate() {
+        self.synchronizationDate = NSDate()
+    }
+    
+    func updateModificationDate() {
+        self.modificationDate = NSDate()
+    }
+
+    func updateItemsSynchronizedAt() {
+        self.itemsSynchronizedAt = NSDate()
     }
 
 //    func getParseObjectFromArray(pfObjects: [PFObject]) -> PFObject? {

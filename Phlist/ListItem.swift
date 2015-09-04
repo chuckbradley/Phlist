@@ -19,12 +19,14 @@ class ListItem : NSManagedObject {
     @NSManaged var active: Bool
     @NSManaged var toBeDeleted: Bool
     @NSManaged var creationDate: NSDate
+    @NSManaged var modificationDate: NSDate
     @NSManaged var synchronizationDate: NSDate
     @NSManaged var list: List
     @NSManaged var photo: Photo?
     
+    
     // session variable
-//    var parseObject:PFObject?
+    var parseObject:PFObject?
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -37,10 +39,14 @@ class ListItem : NSManagedObject {
 
         self.list = list
         parseID = parseItemObject.objectId!
+        parseObject = parseItemObject
         name = parseItemObject["name"] as! String
         searchText = self.name.lowercaseString
         active = parseItemObject["active"] as! Bool
         toBeDeleted = false
+        creationDate = parseItemObject.createdAt!
+        modificationDate = NSDate()
+        synchronizationDate = NSDate()
 
         if let parseFile = parseItemObject["photo"] as? PFFile {
             // create Photo instances for the item
@@ -68,8 +74,8 @@ class ListItem : NSManagedObject {
         active = true
         toBeDeleted = false
         creationDate = NSDate()
+        modificationDate = NSDate()
         synchronizationDate = (NSDate.distantPast() as! NSDate)
-        
     }
     
     var activityState: String {
@@ -77,16 +83,11 @@ class ListItem : NSManagedObject {
         return "Archived"
     }
 
-//    func getParseObjectFromArray(pfObjects: [PFObject]) -> PFObject? {
-//        if self.parseObject == nil {
-//            for object in pfObjects {
-//                if object.objectId == self.parseID {
-//                    self.parseObject = object
-//                    return object
-//                }
-//            }
-//        }
-//        return self.parseObject
-//    }
+    func updateSynchronizationDate() {
+        self.synchronizationDate = NSDate()
+    }
 
+    func updateModificationDate() {
+        self.modificationDate = NSDate()
+    }
 }

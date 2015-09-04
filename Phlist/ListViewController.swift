@@ -66,9 +66,9 @@ class ListViewController: UITableViewController, NSFetchedResultsControllerDeleg
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow() {
-                let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
+                let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
                 let destination = segue.destinationViewController as! DetailViewController
-                destination.detailItem = object
+                destination.listItem = object
             }
         }
     }

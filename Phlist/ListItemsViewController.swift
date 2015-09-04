@@ -16,9 +16,9 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     var list:List!
     let model = ModelController.one
-
+    var selectedItem:ListItem?
+    
     @IBOutlet weak var tableView: UITableView!
-
 
 
     override func viewDidLoad() {
@@ -54,31 +54,25 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
 
-
-    override func viewDidLayoutSubviews() {
-        addNewItemPanelDismisser!.cancelsTouchesInView = false
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        selectedItem = nil
     }
-    
+
+//    override func viewDidLayoutSubviews() {
+//        addNewItemPanelDismisser!.cancelsTouchesInView = false
+//    }
+
 
 
     // MARK: - Segues
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "showDetail" {
-            if let indexPath = self.tableView.indexPathForSelectedRow() {
-//                let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
-                let destination = segue.destinationViewController as! DetailViewController
-//                destination.detailItem = object
-                let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
-                destination.listItem = item
-            }
-        }
         if segue.identifier == "showItemDetail" {
             let destination = segue.destinationViewController as! DetailViewController
             if let item = self.selectedItem {
                 destination.listItem = item
             }
-//            destination.listItem = fetchedResultsController.fetchedObjects?[0] as? ListItem
         }
     }
 
@@ -156,7 +150,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
             if !context.save(&error) {
                 // Replace this implementation with code to handle the error appropriately.
                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                //println("Unresolved error \(error), \(error.userInfo)")
+                println("Unresolved error \(error), \(error!.userInfo)")
                 abort()
             }
         }
@@ -194,19 +188,31 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func toggleItemActivation(item: ListItem) {
-        if item.active { item.active = false }
-        else { item.active = true }
+        item.active = !item.active
         self.model.save()
+        if let pfItem = item.parseObject {
+            pfItem["active"] = item.active
+            pfItem.saveInBackgroundWithBlock{
+                success, error in
+                if success {
+                    item.synchronizationDate = NSDate()
+                    self.model.save()
+                }
+            }
+        }
         tableView.reloadData()
     }
     
-    var selectedItem:ListItem?
-    
     func thumbnailTapped(item: ListItem) {
-        println("thumbnailTapped: item = \(item.name)")
         selectedItem = item
-        performSegueWithIdentifier("showItemDetail", sender: self)
-
+        model.loadParseItemForItem(item) {
+            pfItem, error in
+            if error != nil {
+                println("thumbnailTapped error = \(error!.description)")
+            } else {
+                self.performSegueWithIdentifier("showItemDetail", sender: self)
+            }
+        }
     }
     
 
