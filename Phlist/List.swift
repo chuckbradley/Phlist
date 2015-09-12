@@ -42,19 +42,7 @@ class List : NSManagedObject {
         creationDate = parseListObject.createdAt!
         modificationDate = NSDate()
         toBeDeleted = false
-
-        /* if items are added to parse object
-        // if the parse list object has items, generate ListItem instances and add to array
-        if let listItems = parseListObject["items"] as? [PFObject] {
-            for item in listItems {
-                let listItem = ListItem(parseItemObject: item, list: self, context: context)
-                self.items.append(listItem)
-            }
-        }
-        self.itemsSynchronizedAt = NSDate()
-        */
-
-        self.synchronizationDate = NSDate()
+        synchronizationDate = NSDate()
     }
     
     // init without parse list object
@@ -66,6 +54,7 @@ class List : NSManagedObject {
         user = model.user!
         toBeDeleted = false
         creationDate = NSDate()
+        modificationDate = NSDate()
         itemsSynchronizedAt = (NSDate.distantPast() as! NSDate)
         synchronizationDate = (NSDate.distantPast() as! NSDate)
     }

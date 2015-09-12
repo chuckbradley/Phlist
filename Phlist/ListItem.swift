@@ -50,7 +50,7 @@ class ListItem : NSManagedObject {
 
         if let parseFile = parseItemObject["photo"] as? PFFile {
             // create Photo instances for the item
-            self.photo = Photo(parseItemObject: parseItemObject, context: context)
+            self.photo = Photo(parsePhotoObject: parseFile, listItem: self, context: context)
             parseFile.getDataInBackgroundWithBlock {
                 (imageData: NSData?, error: NSError?) -> Void in
                 if error == nil {

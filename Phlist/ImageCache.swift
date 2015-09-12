@@ -2,7 +2,7 @@
 //  ImageCache.swift
 //  Phlist
 //
-//  Created by Chuck Bradley on 7/19/15.
+//  Created by Chuck Bradley on 8/29/15.
 //  Copyright (c) 2015 FreedomMind. All rights reserved.
 //
 
@@ -10,7 +10,7 @@ import UIKit
 
 class ImageCache {
     
-    private var inMemoryCache = NSCache()
+    private var cache = NSCache()
     
     // MARK: - Retreiving images
     
@@ -25,11 +25,11 @@ class ImageCache {
         var data: NSData?
         
         // First try the memory cache
-        if let image = inMemoryCache.objectForKey(path) as? UIImage {
+        if let image = cache.objectForKey(path) as? UIImage {
             return image
         }
         
-        // Next Try the hard drive
+        // Next try the hard drive
         if let data = NSData(contentsOfFile: path) {
             return UIImage(data: data)
         }
@@ -44,13 +44,13 @@ class ImageCache {
         
         // If the image is nil, remove images from the cache
         if image == nil {
-            inMemoryCache.removeObjectForKey(path)
+            cache.removeObjectForKey(path)
             NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
             return
         }
         
         // Otherwise, keep the image in memory
-        inMemoryCache.setObject(image!, forKey: path)
+        cache.setObject(image!, forKey: path)
         
         // And in documents directory
         let data = UIImagePNGRepresentation(image!)

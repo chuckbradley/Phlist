@@ -22,19 +22,38 @@ class Photo : NSManagedObject {
     @NSManaged var item: ListItem
     
     // session variable
-//    var parseObject:PFObject?
+    let model = ModelController.one
+    let cache = ModelController.imageCache
+
+    var parseObject:PFFile?
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    init(parseItemObject:PFObject, context: NSManagedObjectContext) {
+    init(parsePhotoObject:PFFile, listItem: ListItem, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
-        parseID = parseItemObject.objectId!
-        filename = "\(parseItemObject.objectId!).png"
-        toBeDeleted = false
 
+//        parseID = parseItemObject.objectId!
+//        filename = "\(parsePhotoObject.objectId!).png"
+
+        creationDate = NSDate()
+        filename = "img_\(creationDate).png"
+        item = listItem
+        toBeDeleted = false
+        loaded = false
+    }
+
+    init(listItem: ListItem, context: NSManagedObjectContext) {
+        let entity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: context)!
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        
+        creationDate = NSDate()
+        filename = "img_\(creationDate).png"
+        item = listItem
+        toBeDeleted = false
+        loaded = false
     }
 
 
@@ -57,14 +76,14 @@ class Photo : NSManagedObject {
     
     var image: UIImage? {
         get {
-            if let img = Photo.imageCache.imageWithIdentifier(filename) {
+            if let img = cache.imageWithIdentifier(filename) {
                 return img
             } else {
                 return nil
             }
         }
         set {
-            Photo.imageCache.storeImage(newValue, withIdentifier: filename)
+            cache.storeImage(newValue, withIdentifier: filename)
         }
     }
     
@@ -118,11 +137,6 @@ class Photo : NSManagedObject {
 //            self.defaultImage = UIImage(named: "no-photo")
 //        }
     }
-    
-    
-    // image cache
-    static let imageCache = ImageCache()
-
     
     
 }

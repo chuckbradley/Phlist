@@ -63,8 +63,22 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 //        addNewItemPanelDismisser!.cancelsTouchesInView = false
 //    }
 
+    @IBAction func tapLogoutButton(sender: AnyObject) {
+        model.logout(self)
+    }
 
+    @IBAction func tapRefreshButton(sender: AnyObject) {
+        refreshList()
+    }
 
+    func refreshList() {
+        model.syncItemsInList(list) {
+            success, error in
+            self.fetchedResultsController.performFetch(nil)
+            self.tableView.reloadData()
+        }
+    }
+    
     // MARK: - Segues
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -177,6 +191,11 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         cell.nameButton.setTitle(listItem.name, forState: .Normal)
         cell.listItem = listItem
+        if let photo = listItem.photo {
+            cell.thumbnailButton.setBackgroundImage(photo.image, forState: .Normal)
+        } else {
+            cell.thumbnailButton.setBackgroundImage(UIImage(named: "phlist-icon-grey"), forState: .Normal)
+        }
         cell.delegate = self
         // TODO: get image info
         
@@ -189,13 +208,14 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     func toggleItemActivation(item: ListItem) {
         item.active = !item.active
+        item.updateModificationDate()
         self.model.save()
         if let pfItem = item.parseObject {
             pfItem["active"] = item.active
             pfItem.saveInBackgroundWithBlock{
                 success, error in
                 if success {
-                    item.synchronizationDate = NSDate()
+                    item.updateSynchronizationDate()
                     self.model.save()
                 }
             }
@@ -205,7 +225,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func thumbnailTapped(item: ListItem) {
         selectedItem = item
-        model.loadParseItemForItem(item) {
+        model.loadParseItemForListItem(item) {
             pfItem, error in
             if error != nil {
                 println("thumbnailTapped error = \(error!.description)")
@@ -244,7 +264,6 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }()
     
     
-    
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
         self.tableView.beginUpdates()
     }
@@ -261,15 +280,14 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        println("ListItemsViewController.controller(_:didChangeObject:atIndexPath:[\(indexPath!.section)-\(indexPath!.row)]forChangeType:[\(type.rawValue)]newIndexPath:[\(newIndexPath?.section)-\(newIndexPath?.row)])")
         switch type {
         case .Insert:
             tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
         case .Delete:
             tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
         case .Update:
-            // TODO: add condition for active vs. archive
-//            self.configureCell(tableView.cellForRowAtIndexPath(indexPath!)!, atIndexPath: indexPath!)
-            println("updated object in section \(indexPath!.section), row \(indexPath!.row)")
+            self.tableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
         case .Move:
             tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
             tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
@@ -378,15 +396,12 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
 
     func tapPlusButton(sender: AnyObject) {
-        println("add button tapped")
         displayAddNewItemPanel()
     }
 
 
     func tapAddNewItemButton(sender: AnyObject) {
-        println("tapAddNewItemButton:")
         let newItemName = newItemNameField!.text
-        println("new item name = \(newItemName)")
         model.addItemWithName(newItemName, toList: self.list!)
         tableView.reloadData()
         dismissAddNewItemPanel()

@@ -193,9 +193,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     func notify(message:String) {
         let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .Default) { action in })
+        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
         self.presentViewController(alertController, animated: true, completion: nil)
-        
     }
     
     func tapAway(recognizer: UITapGestureRecognizer) {
