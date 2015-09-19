@@ -19,7 +19,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var messageTextView: UITextView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
-    var tapRecognizer: UITapGestureRecognizer? = nil
+    var tapAwayRecognizer: UITapGestureRecognizer? = nil
     let model = ModelController.one
 
     override func viewDidLoad() {
@@ -29,8 +29,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         passwordField.attributedPlaceholder = NSAttributedString(string:"password",
             attributes:[NSForegroundColorAttributeName: UIColor.whiteColor()])
         
-        tapRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
-        tapRecognizer!.numberOfTapsRequired = 1
+        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
 
         // example of observer for NETWORK_STATUS_NOTIFICATION
         // NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectivityChanged", name: NETWORK_STATUS_NOTIFICATION, object: nil)
@@ -46,7 +45,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        self.view.addGestureRecognizer(tapRecognizer!)
+        self.view.addGestureRecognizer(tapAwayRecognizer!)
         activityIndicator.hidden = true
         emailField.becomeFirstResponder()
     }
@@ -137,8 +136,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
 
         PFUser.logInWithUsernameInBackground(email, password: password) {
             (user: PFUser?, error: NSError?) -> Void in
-            self.activityIndicator.hidden = true
-            self.activityIndicator.stopAnimating()
             self.messageTextView.text = ""
             if user != nil {
                 // Do stuff after successful login.
@@ -148,6 +145,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             } else {
                 // The login failed. Check error to see why.
                 if let error = error {
+                    self.activityIndicator.hidden = true
+                    self.activityIndicator.stopAnimating()
                     var errorString = error.userInfo!["error"] as! NSString
                     let errorCode = error.userInfo!["code"] as! Int
                     if errorCode == 100 {
@@ -181,6 +180,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     func proceedToApp() {
         model.syncLists {
             success, error in
+            self.activityIndicator.hidden = true
+            self.activityIndicator.stopAnimating()
             let controller = self.storyboard!.instantiateViewControllerWithIdentifier("NavigationController") as! UINavigationController
             self.presentViewController(controller, animated: true, completion: nil)
         }
@@ -188,6 +189,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
 
     
     func displayError(errorString: String) {
+        self.activityIndicator.hidden = true
+        self.activityIndicator.stopAnimating()
         self.messageTextView.text = errorString
     }
     

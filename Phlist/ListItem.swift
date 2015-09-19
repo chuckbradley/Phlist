@@ -22,11 +22,16 @@ class ListItem : NSManagedObject {
     @NSManaged var modificationDate: NSDate
     @NSManaged var synchronizationDate: NSDate
     @NSManaged var list: List
-    @NSManaged var photo: Photo?
     
+    // Photo properties
+    @NSManaged var photoFilename: String // local filename
+    @NSManaged var hasPhoto: Bool
     
     // session variable
     var parseObject:PFObject?
+    let model = ModelController.one
+    let cache = ModelController.imageCache
+    var photoLoaded = false
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -48,20 +53,8 @@ class ListItem : NSManagedObject {
         modificationDate = NSDate()
         synchronizationDate = NSDate()
 
-        if let parseFile = parseItemObject["photo"] as? PFFile {
-            // create Photo instances for the item
-            self.photo = Photo(parsePhotoObject: parseFile, listItem: self, context: context)
-            parseFile.getDataInBackgroundWithBlock {
-                (imageData: NSData?, error: NSError?) -> Void in
-                if error == nil {
-                    if let imageData = imageData {
-                        let image = UIImage(data:imageData)
-                        // TODO: add image to cache using self.photo.filename
-                        self.photo!.loaded = true
-                    }
-                }
-            }
-        }
+        hasPhoto = parseItemObject["hasPhoto"] as! Bool
+        photoFilename = hasPhoto ? parseItemObject["photoFilename"] as! String : ""
     }
 
     init(name:String, list: List, context: NSManagedObjectContext) {
@@ -76,18 +69,53 @@ class ListItem : NSManagedObject {
         creationDate = NSDate()
         modificationDate = NSDate()
         synchronizationDate = (NSDate.distantPast() as! NSDate)
+
+        hasPhoto = false
+        photoFilename = ""
     }
+
     
+    // MARK: - Utility
     var activityState: String {
         if self.active { return "Active" }
         return "Archived"
     }
-
+    
     func updateSynchronizationDate() {
         self.synchronizationDate = NSDate()
     }
-
+    
     func updateModificationDate() {
         self.modificationDate = NSDate()
+    }    
+
+
+    // MARK: - Photo
+    
+    var photoImage: UIImage? {
+        get {
+            if let img = cache.imageWithIdentifier(photoFilename) {
+                return img
+            } else {
+                return nil
+            }
+        }
+        set {
+            cache.storeDataForImage(newValue, withIdentifier: photoFilename, withCompression: true)
+        }
     }
+
+    var photoImageData: NSData? {
+        get {
+            if let data = cache.dataFromImageWithIdentifier(photoFilename) {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            cache.storeImageData(newValue, withIdentifier: photoFilename)
+        }
+    }
+
 }

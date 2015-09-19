@@ -18,20 +18,16 @@ class User : NSManagedObject {
     @NSManaged var email: String
     @NSManaged var listsSynchronizedAt: NSDate?
     @NSManaged var lists: [List]
-
-    // session variable
-//    var parseUser:PFUser?
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    // init from saved parse list object
+    // init from parse list object
     init(parseUserObject:PFUser, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("User", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-//        self.parseUser = parseUserObject
         self.parseID = parseUserObject.objectId!
         self.email = parseUserObject.email!
         self.listsSynchronizedAt = NSDate()

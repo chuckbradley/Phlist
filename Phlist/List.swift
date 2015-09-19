@@ -19,7 +19,6 @@ class List : NSManagedObject {
     @NSManaged var creationDate: NSDate
     @NSManaged var modificationDate: NSDate
     @NSManaged var synchronizationDate: NSDate?
-    @NSManaged var itemsSynchronizedAt: NSDate?
     @NSManaged var items: [ListItem]
     @NSManaged var user: User
 
@@ -55,7 +54,6 @@ class List : NSManagedObject {
         toBeDeleted = false
         creationDate = NSDate()
         modificationDate = NSDate()
-        itemsSynchronizedAt = (NSDate.distantPast() as! NSDate)
         synchronizationDate = (NSDate.distantPast() as! NSDate)
     }
 
@@ -66,37 +64,5 @@ class List : NSManagedObject {
     func updateModificationDate() {
         self.modificationDate = NSDate()
     }
-
-    func updateItemsSynchronizedAt() {
-        self.itemsSynchronizedAt = NSDate()
-    }
-
-//    func getParseObjectFromArray(pfObjects: [PFObject]) -> PFObject? {
-//        if self.parseObject == nil {
-//            for object in pfObjects {
-//                if object.objectId == self.parseID {
-//                    self.parseObject = object
-//                    return object
-//                }
-//            }
-//        }
-//        return self.parseObject
-//    }
-
-//    func addListItems(listItems:[ListItem]) {
-//        for item in listItems {
-//            // TODO: check for duplicates
-//            self.items.append(item)
-//        }
-//    }
-
-//    func addParseItemObjects(listItems:[PFObject], context: NSManagedObjectContext) {
-//        for item in listItems {
-//            let listItem = ListItem(parseItemObject: item, list: self, context: context)
-//            // TODO: check for duplicates
-//            self.items.append(listItem)
-//        }
-//    }
-
 
 }

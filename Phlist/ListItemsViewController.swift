@@ -20,6 +20,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     
     @IBOutlet weak var tableView: UITableView!
 
+    // MARK: - Lifecycle Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,9 +60,8 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         selectedItem = nil
     }
 
-//    override func viewDidLayoutSubviews() {
-//        addNewItemPanelDismisser!.cancelsTouchesInView = false
-//    }
+
+    // MARK: - Actions
 
     @IBAction func tapLogoutButton(sender: AnyObject) {
         model.logout(self)
@@ -99,7 +99,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         var title = "Archived"
-
+        
         // section.description returns "0" for first and "1" for second
         if section.description == "0" {
             if let firstItem = fetchedResultsController.fetchedObjects?[0] as? ListItem {
@@ -118,6 +118,14 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         // section.description returns string of first sortDescriptor
         // println("section.value = \(section.value) and section.description = \(section.description)")
         // println("section name = \(sectionInfo.name) and indexTitle = \(sectionInfo.indexTitle)")
+    }
+
+
+    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView //recast your view as a UITableViewHeaderFooterView
+        header.contentView.backgroundColor = UIColor.orangeColor()
+        header.textLabel.textColor = UIColor.whiteColor()
+        header.contentView.frame.size.height = 36.0
     }
 
 
@@ -157,16 +165,10 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
+            println("tableView:commitEditingStyle:forRowAtIndexPath[\(indexPath.row)]")
             let context = self.fetchedResultsController.managedObjectContext
-            context.deleteObject(self.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject)
-            
-            var error: NSError? = nil
-            if !context.save(&error) {
-                // Replace this implementation with code to handle the error appropriately.
-                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                println("Unresolved error \(error), \(error!.userInfo)")
-                abort()
-            }
+            let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+            model.removeItem(item)
         }
     }
     
@@ -176,31 +178,28 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         else { return 44.0 }
     }
 
-    
     func configureArchiveCell(cell: ListItemCell, atIndexPath indexPath: NSIndexPath) {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         cell.nameButton.setTitle(listItem.name, forState: .Normal)
         cell.nameButton.sizeToFit()
         cell.listItem = listItem
         cell.delegate = self
-        // TODO: get image info
-        
     }
+
 
     func configureActiveCell(cell: ActiveListItemCell, atIndexPath indexPath: NSIndexPath) {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         cell.nameButton.setTitle(listItem.name, forState: .Normal)
         cell.listItem = listItem
-        if let photo = listItem.photo {
-            cell.thumbnailButton.setBackgroundImage(photo.image, forState: .Normal)
+        if let photo = listItem.photoImage {
+            cell.thumbnailButton.setBackgroundImage(photo, forState: .Normal)
         } else {
             cell.thumbnailButton.setBackgroundImage(UIImage(named: "phlist-icon-grey"), forState: .Normal)
         }
         cell.delegate = self
-        // TODO: get image info
-        
     }
 
+    // MARK: - Table Cell Delegate Actions
 
     func nameTapped(item: ListItem) {
         toggleItemActivation(item)
@@ -280,7 +279,6 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-        println("ListItemsViewController.controller(_:didChangeObject:atIndexPath:[\(indexPath!.section)-\(indexPath!.row)]forChangeType:[\(type.rawValue)]newIndexPath:[\(newIndexPath?.section)-\(newIndexPath?.row)])")
         switch type {
         case .Insert:
             tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
@@ -311,7 +309,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     
     
     
-    // MARK: - Add-New-Item Mechanism
+    // MARK: - UI
     
     var addNewItemPanel: UIView?
     var addNewItemButton: UIButton?
