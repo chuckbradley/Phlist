@@ -36,7 +36,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
 //    func connectivityChanged() {
-//        println("LoginViewController.connectivityChanged to \(connectivityStatus)")
+//        print("LoginViewController.connectivityChanged to \(connectivityStatus)")
 //    }
 //
 //    deinit {
@@ -52,7 +52,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     
     @IBAction func loginButtonTouch(sender: AnyObject) {
-        if emailField.text.isEmpty || passwordField.text.isEmpty {
+        if emailField.text!.isEmpty || passwordField.text!.isEmpty {
             notify("Please enter both your email and password.")
         } else {
             attemptLogin()
@@ -62,7 +62,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     
     @IBAction func signupButtonTouch(sender: AnyObject) {
-        if emailField.text.isEmpty || passwordField.text.isEmpty {
+        if emailField.text!.isEmpty || passwordField.text!.isEmpty {
             notify("Go ahead and enter your email and desired password.")
         } else {
             attemptSignup()
@@ -77,9 +77,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
 
         let email = emailField.text!
         let password = passwordField.text!
-        println("\nSign up: email=\(email), password=\(password)")
+        print("\nSign up: email=\(email), password=\(password)")
     
-        var user = PFUser()
+        let user = PFUser()
         user.username = email
         user.email = email
         user.password = password
@@ -89,8 +89,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             self.activityIndicator.hidden = true
             self.activityIndicator.stopAnimating()
             if let error = error {
-                var errorString = error.userInfo!["error"] as! NSString
-                let errorCode = error.userInfo!["code"] as! Int
+                var errorString = error.userInfo["error"] as! NSString
+                let errorCode = error.userInfo["code"] as! Int
                 if errorCode == 100 {
                     errorString = "Error: No network connection"
                 } else if errorCode == 101 {
@@ -111,7 +111,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                     errorString = "Error: Signup failed"
                 }
                 // Show the errorString somewhere and let the user try again.
-                println("\nerror code = \(errorCode)")
+                print("\nerror code = \(errorCode)")
                 self.displayError("\(errorString)")
             } else {
                 // Hooray! Let them use the app now.
@@ -132,7 +132,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         // populate Parse login
         let email = emailField.text!
         let password = passwordField.text!
-        println("\nLogin: email=\(email), password=\(password)")
+        print("\nLogin: email=\(email), password=\(password)")
 
         PFUser.logInWithUsernameInBackground(email, password: password) {
             (user: PFUser?, error: NSError?) -> Void in
@@ -147,8 +147,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 if let error = error {
                     self.activityIndicator.hidden = true
                     self.activityIndicator.stopAnimating()
-                    var errorString = error.userInfo!["error"] as! NSString
-                    let errorCode = error.userInfo!["code"] as! Int
+                    var errorString = error.userInfo["error"] as! NSString
+                    let errorCode = error.userInfo["code"] as! Int
                     if errorCode == 100 {
                         errorString = "Darn! No network connection"
                     } else if errorCode == 101 {
@@ -167,10 +167,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                         errorString = "Error: Login failed"
                     }
                     // Show the errorString somewhere and let the user try again.
-                    println("\nerror code = \(errorCode)")
+                    print("\nerror code = \(errorCode)")
                     self.displayError("\(errorString)")
                 } else {
-                    println("no user or error")
+                    print("no user or error")
                 }
             }
         }
@@ -218,7 +218,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             passwordField.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
-            if !emailField.text.isEmpty && !passwordField.text.isEmpty {
+            if !emailField.text!.isEmpty && !passwordField.text!.isEmpty {
                 attemptLogin()
             }
         }

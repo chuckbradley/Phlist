@@ -56,10 +56,10 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     
-    // MARK: - Parse Loaders
+    // MARK: - Cloud Interaction
 
     func loadUsers() {
-        model.loadParseListForList(list) {
+        model.updateParseListForList(list) {
             cloudList, error in
             if cloudList != nil {
                 self.users = cloudList!["acceptedBy"] as! [String]
@@ -69,9 +69,12 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 self.usersTable.reloadData()
                 self.inviteesTable.reloadData()
             } else if error != nil {
-                // TODO: display error message
                 if error!.code == 100 {
                     println("loadUsers: connectivity error")
+                    self.displayModalWithMessage("There is no network connection. Try again later.", andTitle: "Error")
+                } else {
+                    println("loadUsers: error")
+                    self.displayModalWithMessage("There was some sort of problem. Try again later.", andTitle: "Error")
                 }
             }
         }
@@ -87,8 +90,8 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 self.invitees.append(email)
                 self.inviteesTable.reloadData()
             } else if error != nil {
-                // TODO: display error message
                 println("sendInvite error: \(error!.description)")
+                self.displayModalWithMessage("The invitation couldn't be sent. Try again later.", andTitle: "Error")
             }
         }
     }
@@ -147,9 +150,13 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
 
-
-
-
+    // MARK: - Utility
+    
+    func displayModalWithMessage(message: String, andTitle title: String?) {
+        let alertController: UIAlertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
+        self.presentViewController(alertController, animated: true, completion: nil)
+    }
 
 
 }

@@ -12,7 +12,7 @@ import CoreData
 import Parse
 
 
-class ListItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, ListItemCellDelegate {
+class ListItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, UITextFieldDelegate, ListItemCellDelegate {
 
     var list:List!
     let model = ModelController.one
@@ -39,7 +39,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         buildAddNewItemUI()
 
         model.assignParseObjectToList(list) {
-            success, pfList, error in
+            pfList, error in
             if pfList != nil {
                 // syncronize items with cloud
                 self.model.syncItemsInList(self.list) {
@@ -251,7 +251,6 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         let compoundPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([parentListPredicate, noDeletedListPredicate])
         
         fetchRequest.predicate = compoundPredicate
-        //        fetchRequest.predicate = NSPredicate(format: "list == %@", self.list);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
             managedObjectContext: self.model.context,
@@ -341,6 +340,8 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         let paddingView = UIView(frame: CGRectMake(0, 0, 8, newItemNameField!.frame.height))
         newItemNameField!.leftView = paddingView
         newItemNameField!.leftViewMode = UITextFieldViewMode.Always
+        newItemNameField!.returnKeyType = .Done
+        newItemNameField!.delegate = self
         
         // create button
         addNewItemButton = (UIButton.buttonWithType(.System) as! UIButton)
@@ -399,12 +400,22 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
 
     func tapAddNewItemButton(sender: AnyObject) {
-        let newItemName = newItemNameField!.text
-        model.addItemWithName(newItemName, toList: self.list!)
-        tableView.reloadData()
-        dismissAddNewItemPanel()
+        addNewItem()
     }
     
-    
+    func addNewItem() {
+        if !newItemNameField!.text.isEmpty {
+            let newItemName = newItemNameField!.text
+            model.addItemWithName(newItemName, toList: self.list!)
+            tableView.reloadData()
+        }
+        dismissAddNewItemPanel()
+    }
+
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        addNewItem()
+        return true
+    }
+
 }
 
