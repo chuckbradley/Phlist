@@ -45,13 +45,13 @@ class Connectivity: NSObject {
     }
     
     func statusChangedWithReachability(reachability: Reachability) {
-        var networkStatus: NetworkStatus = reachability.currentReachabilityStatus()
+        let networkStatus: NetworkStatus = reachability.currentReachabilityStatus()
         
-        if networkStatus.value == NotReachable.value {
+        if networkStatus.rawValue == NotReachable.rawValue {
             connectivityStatus = NOT_REACHABLE
-        } else if networkStatus.value == ReachableViaWiFi.value {
+        } else if networkStatus.rawValue == ReachableViaWiFi.rawValue {
             connectivityStatus = REACHABLE_WITH_WIFI
-        } else if networkStatus.value == ReachableViaWWAN.value {
+        } else if networkStatus.rawValue == ReachableViaWWAN.rawValue {
             connectivityStatus = REACHABLE_WITH_WWAN
         }
         // println("Connectivity changed to \(networkStatus.value): \(connectivityStatus)")
@@ -60,7 +60,7 @@ class Connectivity: NSObject {
     }
 
     deinit {
-        println("deinit Connectivity")
+        print("deinit Connectivity")
         NSNotificationCenter.defaultCenter().removeObserver(self, name: kReachabilityChangedNotification, object: nil)
     }
 

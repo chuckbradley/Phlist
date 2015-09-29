@@ -61,11 +61,14 @@ class ImageDataCache {
         // If the image is nil, remove images from the cache
         if image == nil {
             dataCache.removeObjectForKey(path)
-            NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+            do {
+                try NSFileManager.defaultManager().removeItemAtPath(path)
+            } catch _ {
+            }
             return
         }
         
-        let data = jpg ? UIImageJPEGRepresentation(image, 0.6) : UIImagePNGRepresentation(image!)
+        let data = jpg ? UIImageJPEGRepresentation(image!, 0.6) : UIImagePNGRepresentation(image!)
         dataCache.setObject(data!, forKey: path)
         data!.writeToFile(path, atomically: true)
     }
@@ -77,7 +80,10 @@ class ImageDataCache {
         // If the image is nil, remove images from the cache
         if data == nil {
             dataCache.removeObjectForKey(path)
-            NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+            do {
+                try NSFileManager.defaultManager().removeItemAtPath(path)
+            } catch _ {
+            }
             return
         }
         
@@ -91,10 +97,13 @@ class ImageDataCache {
     // delete all files in document directory
     func deleteAllImages(completionHandler: () -> Void) {
         let fileManager = NSFileManager.defaultManager()
-        let documentsDirectoryURL: NSURL = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
-        if let enumerator = fileManager.enumeratorAtURL(documentsDirectoryURL, includingPropertiesForKeys: nil, options: nil, errorHandler: nil) {
+        let documentsDirectoryURL = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
+        if let enumerator = fileManager.enumeratorAtURL(documentsDirectoryURL, includingPropertiesForKeys: nil, options: [], errorHandler: nil) {
             while let file = enumerator.nextObject() as? String {
-                fileManager.removeItemAtURL(documentsDirectoryURL.URLByAppendingPathComponent(file), error: nil)
+                do {
+                    try fileManager.removeItemAtURL(documentsDirectoryURL.URLByAppendingPathComponent(file))
+                } catch _ {
+                }
             }
         }
         completionHandler()
@@ -103,7 +112,7 @@ class ImageDataCache {
     // MARK: - Helper
     
     func pathForIdentifier(identifier: String) -> String {
-        let documentsDirectoryURL: NSURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first as! NSURL
+        let documentsDirectoryURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
         let fullURL = documentsDirectoryURL.URLByAppendingPathComponent(identifier)
         return fullURL.path!
     }

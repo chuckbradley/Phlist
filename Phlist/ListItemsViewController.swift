@@ -17,8 +17,12 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     var list:List!
     let model = ModelController.one
     var selectedItem:ListItem?
+
+    let PLACEHOLDER_IMAGE_NAME = "phlist-icon-grey"
     
     @IBOutlet weak var tableView: UITableView!
+
+    var refreshControl:UIRefreshControl!
 
     // MARK: - Lifecycle Methods
 
@@ -32,7 +36,12 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
 
         self.title = list.title
-        
+
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        self.refreshControl.addTarget(self, action: "pulledTable:", forControlEvents: UIControlEvents.ValueChanged)
+        self.tableView.addSubview(refreshControl)
+
         fetchedResultsController.delegate = self
 
         // temporary add-item UI
@@ -44,12 +53,18 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
                 // syncronize items with cloud
                 self.model.syncItemsInList(self.list) {
                     success, error in // are parameters even needed?
-                    self.fetchedResultsController.performFetch(nil)
+                    do {
+                        try self.fetchedResultsController.performFetch()
+                    } catch _ {
+                    }
                     self.tableView.reloadData()
                 }
             } else {
-                // just use locally stored items
-                self.fetchedResultsController.performFetch(nil)
+                do {
+                    // just use locally stored items
+                    try self.fetchedResultsController.performFetch()
+                } catch _ {
+                }
                 self.tableView.reloadData()
             }
         }
@@ -63,19 +78,32 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     // MARK: - Actions
 
-    @IBAction func tapLogoutButton(sender: AnyObject) {
-        model.logout(self)
+    @IBAction func tapRemoveListButton(sender: AnyObject) {
+        removeList()
     }
 
-    @IBAction func tapRefreshButton(sender: AnyObject) {
+    func removeList() {
+        model.confirmRemovalOfList(self.list, fromController: self) {
+            confirmed in
+            if confirmed {
+                self.navigationController?.popViewControllerAnimated(true)
+            }
+        }
+    }
+
+    func pulledTable(sender: AnyObject) {
         refreshList()
     }
 
     func refreshList() {
         model.syncItemsInList(list) {
             success, error in
-            self.fetchedResultsController.performFetch(nil)
+            do {
+                try self.fetchedResultsController.performFetch()
+            } catch _ {
+            }
             self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
         }
     }
     
@@ -84,10 +112,13 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showItemDetail" {
             let destination = segue.destinationViewController as! DetailViewController
-            if let item = self.selectedItem {
-                destination.listItem = item
-            }
+            guard let item = self.selectedItem else { return }
+            destination.listItem = item
+        } else if segue.identifier == "showListDetail" {
+            let destination = segue.destinationViewController as! ListDetailViewController
+            destination.list = self.list
         }
+
     }
 
 
@@ -98,17 +129,16 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        var title = "Archived"
-        
+
         // section.description returns "0" for first and "1" for second
         if section.description == "0" {
             if let firstItem = fetchedResultsController.fetchedObjects?[0] as? ListItem {
                 if firstItem.active {
-                    title = "Active"
+                    return "Active"
                 }
             }
         }
-        return title
+        return "Archived"
 
         // FYI:
         // let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
@@ -122,15 +152,15 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
 
     func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView //recast your view as a UITableViewHeaderFooterView
+        let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.contentView.backgroundColor = UIColor.orangeColor()
-        header.textLabel.textColor = UIColor.whiteColor()
+        header.textLabel!.textColor = UIColor.whiteColor()
         header.contentView.frame.size.height = 36.0
     }
 
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+        let sectionInfo = self.fetchedResultsController.sections![section] 
         return sectionInfo.numberOfObjects
     }
 
@@ -165,8 +195,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            println("tableView:commitEditingStyle:forRowAtIndexPath[\(indexPath.row)]")
-            let context = self.fetchedResultsController.managedObjectContext
+            print("tableView:commitEditingStyle:forRowAtIndexPath[\(indexPath.row)]")
             let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
             model.removeItem(item)
         }
@@ -194,7 +223,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         if let photo = listItem.photoImage {
             cell.thumbnailButton.setBackgroundImage(photo, forState: .Normal)
         } else {
-            cell.thumbnailButton.setBackgroundImage(UIImage(named: "phlist-icon-grey"), forState: .Normal)
+            cell.thumbnailButton.setBackgroundImage(UIImage(named: PLACEHOLDER_IMAGE_NAME), forState: .Normal)
         }
         cell.delegate = self
     }
@@ -227,7 +256,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         model.loadParseItemForListItem(item) {
             pfItem, error in
             if error != nil {
-                println("thumbnailTapped error = \(error!.description)")
+                print("thumbnailTapped error = \(error!.description)")
             } else {
                 self.performSegueWithIdentifier("showItemDetail", sender: self)
             }
@@ -248,7 +277,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let parentListPredicate = NSPredicate(format: "list == %@", self.list) // only items in the parent list
         let noDeletedListPredicate = NSPredicate(format: "toBeDeleted == %@", false) // don't include toBeDeleted
-        let compoundPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([parentListPredicate, noDeletedListPredicate])
+        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [parentListPredicate, noDeletedListPredicate])
         
         fetchRequest.predicate = compoundPredicate
         
@@ -288,10 +317,9 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         case .Move:
             tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
             tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
-        default:
-            return
         }
     }
+
     
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
         self.tableView.endUpdates()
@@ -344,7 +372,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         newItemNameField!.delegate = self
         
         // create button
-        addNewItemButton = (UIButton.buttonWithType(.System) as! UIButton)
+        addNewItemButton = UIButton(type: .System)
         addNewItemButton!.backgroundColor = UIColor.blackColor()
         addNewItemButton!.setTitle("Add", forState: UIControlState.Normal)
         addNewItemButton!.frame = CGRectMake(view.bounds.width-62, 12, 50, 30)
@@ -404,13 +432,17 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     func addNewItem() {
-        if !newItemNameField!.text.isEmpty {
-            let newItemName = newItemNameField!.text
-            model.addItemWithName(newItemName, toList: self.list!)
+        var newItemName = ""
+        if newItemNameField!.text != nil {
+            newItemName = newItemNameField!.text!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+        }
+        if !newItemName.isEmpty {
+            model.addItemWithName(newItemName, toList: list)
             tableView.reloadData()
         }
         dismissAddNewItemPanel()
     }
+
 
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         addNewItem()

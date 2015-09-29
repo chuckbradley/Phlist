@@ -70,10 +70,10 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 self.inviteesTable.reloadData()
             } else if error != nil {
                 if error!.code == 100 {
-                    println("loadUsers: connectivity error")
+                    print("loadUsers: connectivity error")
                     self.displayModalWithMessage("There is no network connection. Try again later.", andTitle: "Error")
                 } else {
-                    println("loadUsers: error")
+                    print("loadUsers: error")
                     self.displayModalWithMessage("There was some sort of problem. Try again later.", andTitle: "Error")
                 }
             }
@@ -81,7 +81,7 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     func sendInvite() {
-        let email = emailField.text
+        let email = emailField.text!
         self.view.endEditing(true)
         emailField.text = ""
         model.inviteAddress(email, forList: list) {
@@ -90,7 +90,7 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
                 self.invitees.append(email)
                 self.inviteesTable.reloadData()
             } else if error != nil {
-                println("sendInvite error: \(error!.description)")
+                print("sendInvite error: \(error!.description)")
                 self.displayModalWithMessage("The invitation couldn't be sent. Try again later.", andTitle: "Error")
             }
         }
@@ -129,11 +129,11 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if tableView == inviteesTable {
-            let cell = tableView.dequeueReusableCellWithIdentifier("InviteeCell", forIndexPath: indexPath) as! UITableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("InviteeCell", forIndexPath: indexPath) 
             self.configureInviteeCell(cell, atIndexPath: indexPath)
             return cell
         } else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("UserCell", forIndexPath: indexPath) as! UITableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("UserCell", forIndexPath: indexPath) 
             self.configureUserCell(cell, atIndexPath: indexPath)
             return cell
         }

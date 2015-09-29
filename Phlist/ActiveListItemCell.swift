@@ -13,7 +13,8 @@ class ActiveListItemCell: ListItemCell {
     @IBOutlet weak var thumbnailButton: UIButton!
     
     @IBAction func thumbnailButtonTapped(sender: AnyObject) {
-        delegate!.thumbnailTapped(self.listItem!)
+        guard let controller = self.delegate else { return }
+        controller.thumbnailTapped(self.listItem!)
     }
     
 }

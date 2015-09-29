@@ -21,7 +21,8 @@ class ListItemCell: UITableViewCell {
     @IBOutlet weak var nameButton: UIButton!
 
     @IBAction func nameButtonTapped(sender: AnyObject) {
-        self.delegate!.nameTapped(listItem!)
+        guard let controller = self.delegate else { return }
+        controller.nameTapped(listItem!)
     }
 
 }

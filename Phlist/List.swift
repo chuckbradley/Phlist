@@ -54,7 +54,7 @@ class List : NSManagedObject {
         toBeDeleted = false
         creationDate = NSDate()
         modificationDate = NSDate()
-        synchronizationDate = (NSDate.distantPast() as! NSDate)
+        synchronizationDate = (NSDate.distantPast() )
     }
 
     func updateSynchronizationDate() {
