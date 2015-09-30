@@ -51,14 +51,14 @@ class ImageDataCache {
     // MARK: - Saving
 
     // store given image with given identifier and optional jpg compression
-    func storeImage(image: UIImage?, withIdentifier identifier: String, withCompression jpg: Bool) {
-        storeDataForImage(image, withIdentifier: identifier, withCompression: jpg)
+    func storeImage(image: UIImage?, withIdentifier identifier: String, withCompression useJpg: Bool) {
+        storeDataForImage(image, withIdentifier: identifier, withCompression: useJpg)
     }
     
     // store data for given image with given identifier and optional jpg compression
-    func storeDataForImage(image: UIImage?, withIdentifier identifier: String, withCompression jpg: Bool) {
+    func storeDataForImage(image: UIImage?, withIdentifier identifier: String, withCompression useJpg: Bool) {
         let path = pathForIdentifier(identifier)
-        // If the image is nil, remove images from the cache
+        // If the image is nil, remove existing image from the cache and directory
         if image == nil {
             dataCache.removeObjectForKey(path)
             do {
@@ -67,8 +67,8 @@ class ImageDataCache {
             }
             return
         }
-        
-        let data = jpg ? UIImageJPEGRepresentation(image!, 0.6) : UIImagePNGRepresentation(image!)
+        // otherwise, create data file and save it in cache and documents directory
+        let data = useJpg ? UIImageJPEGRepresentation(image!, 0.6) : UIImagePNGRepresentation(image!)
         dataCache.setObject(data!, forKey: path)
         data!.writeToFile(path, atomically: true)
     }
@@ -76,8 +76,7 @@ class ImageDataCache {
     // store given data with given identifier
     func storeImageData(data: NSData?, withIdentifier identifier: String) {
         let path = pathForIdentifier(identifier)
-        
-        // If the image is nil, remove images from the cache
+        // If the image is nil, remove existing image from the cache and directory
         if data == nil {
             dataCache.removeObjectForKey(path)
             do {
@@ -86,8 +85,7 @@ class ImageDataCache {
             }
             return
         }
-        
-        // Otherwise, keep the image data in memory and in documents directory
+        // otherwise, keep the image data in cache and documents directory
         dataCache.setObject(data!, forKey: path)
         data!.writeToFile(path, atomically: true)
     }

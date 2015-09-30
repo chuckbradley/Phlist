@@ -40,6 +40,10 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         inviteesTable.delegate = self
 
         tapAwayRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
+
+        setFontName("OpenSans", forView: self.view, andSubViews: true)
+        setFontName("Menlo-Regular", forView: emailField, andSubViews: false)
+
         
         loadUsers()
 
@@ -59,15 +63,13 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: - Cloud Interaction
 
     func loadUsers() {
+        if let cloudList = list.cloudObject {
+            populateTables(cloudList)
+        }
         model.updateParseListForList(list) {
             cloudList, error in
-            if cloudList != nil {
-                self.users = cloudList!["acceptedBy"] as! [String]
-                let editorSet = Set(cloudList!["editors"] as! [String])
-                let inviteeSet = editorSet.exclusiveOr(Set(self.users))
-                self.invitees = Array(inviteeSet)
-                self.usersTable.reloadData()
-                self.inviteesTable.reloadData()
+            if let cloudList = cloudList {
+                self.populateTables(cloudList)
             } else if error != nil {
                 if error!.code == 100 {
                     print("loadUsers: connectivity error")
@@ -79,6 +81,19 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             }
         }
     }
+
+
+    func populateTables(cloudList:PFObject) {
+        guard let users = cloudList["acceptedBy"] as? [String] else { return }
+        guard let editors = cloudList["editors"] as? [String] else { return }
+        self.users = users
+        let editorSet = Set(editors)
+        let inviteeSet = editorSet.exclusiveOr(Set(self.users))
+        self.invitees = Array(inviteeSet)
+        self.usersTable.reloadData()
+        self.inviteesTable.reloadData()
+    }
+
 
     func sendInvite() {
         let email = emailField.text!
@@ -142,11 +157,13 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     func configureUserCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         let email = users[indexPath.row] as String
         cell.textLabel!.text = email
+        setFontName("Menlo-Regular", forView: cell, andSubViews: true)
     }
 
     func configureInviteeCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         let email = invitees[indexPath.row] as String
         cell.textLabel!.text = email
+        setFontName("Menlo-Regular", forView: cell, andSubViews: true)
     }
 
 

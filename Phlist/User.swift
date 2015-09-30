@@ -14,9 +14,8 @@ import Parse
 
 class User : NSManagedObject {
     
-    @NSManaged var parseID: String?
+    @NSManaged var cloudID: String?
     @NSManaged var email: String
-    @NSManaged var listsSynchronizedAt: NSDate?
     @NSManaged var lists: [List]
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
@@ -28,9 +27,8 @@ class User : NSManagedObject {
         let entity = NSEntityDescription.entityForName("User", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        self.parseID = parseUserObject.objectId!
+        self.cloudID = parseUserObject.objectId!
         self.email = parseUserObject.email!
-        self.listsSynchronizedAt = NSDate()
     }
     
 }

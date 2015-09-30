@@ -13,7 +13,7 @@ import Parse
 
 class ListItem : NSManagedObject {
 
-    @NSManaged var parseID: String?
+    @NSManaged var cloudID: String?
     @NSManaged var name: String
     @NSManaged var searchText: String
     @NSManaged var active: Bool
@@ -28,7 +28,7 @@ class ListItem : NSManagedObject {
     @NSManaged var hasPhoto: Bool
     
     // session variable
-    var parseObject:PFObject?
+    var cloudObject:PFObject?
     let model = ModelController.one
     let cache = ModelController.imageCache
     var photoLoaded = false
@@ -43,8 +43,8 @@ class ListItem : NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
 
         self.list = list
-        parseID = parseItemObject.objectId!
-        parseObject = parseItemObject
+        cloudID = parseItemObject.objectId!
+        cloudObject = parseItemObject
         name = parseItemObject["name"] as! String
         searchText = self.name.lowercaseString
         active = parseItemObject["active"] as! Bool

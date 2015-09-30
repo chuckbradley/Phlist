@@ -47,6 +47,13 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         // temporary add-item UI
         buildAddNewItemUI()
 
+        setFontName("OpenSans", forView: self.view, andSubViews: true)
+
+        do {
+            try fetchedResultsController.performFetch()
+        } catch _ {
+        }
+
         model.assignParseObjectToList(list) {
             pfList, error in
             if pfList != nil {
@@ -155,7 +162,8 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.contentView.backgroundColor = UIColor.orangeColor()
         header.textLabel!.textColor = UIColor.whiteColor()
-        header.contentView.frame.size.height = 36.0
+        setFontName("OpenSans", forView: header.textLabel!, andSubViews: false)
+        header.contentView.frame.size.height = 38.0
     }
 
 
@@ -210,6 +218,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     func configureArchiveCell(cell: ListItemCell, atIndexPath indexPath: NSIndexPath) {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         cell.nameButton.setTitle(listItem.name, forState: .Normal)
+        setFontName("OpenSans", forView: cell.nameButton, andSubViews: false)
         cell.nameButton.sizeToFit()
         cell.listItem = listItem
         cell.delegate = self
@@ -219,6 +228,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     func configureActiveCell(cell: ActiveListItemCell, atIndexPath indexPath: NSIndexPath) {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         cell.nameButton.setTitle(listItem.name, forState: .Normal)
+        setFontName("OpenSans", forView: cell.nameButton, andSubViews: false)
         cell.listItem = listItem
         if let photo = listItem.photoImage {
             cell.thumbnailButton.setBackgroundImage(photo, forState: .Normal)
@@ -238,7 +248,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         item.active = !item.active
         item.updateModificationDate()
         self.model.save()
-        if let pfItem = item.parseObject {
+        if let pfItem = item.cloudObject {
             pfItem["active"] = item.active
             pfItem.saveInBackgroundWithBlock{
                 success, error in

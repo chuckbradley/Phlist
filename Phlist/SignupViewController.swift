@@ -1,24 +1,24 @@
 //
-//  LoginViewController.swift
+//  SignupViewController.swift
 //  Phlist
 //
-//  Created by Chuck Bradley on 7/26/15.
-//  Copyright (c) 2015 FreedomMind. All rights reserved.
+//  Created by Chuck Bradley on 9/30/15.
+//  Copyright © 2015 FreedomMind. All rights reserved.
 //
 
-import UIKit
 import Foundation
+import UIKit
 import Parse
 import CoreData
 
 
-class LoginViewController: UIViewController, UITextFieldDelegate {
-    
+class SignupViewController: UIViewController, UITextFieldDelegate {
+
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
     @IBOutlet weak var messageTextView: UITextView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    
+
     var tapAwayRecognizer: UITapGestureRecognizer? = nil
     let model = ModelController.one
 
@@ -28,7 +28,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             attributes:[NSForegroundColorAttributeName: UIColor.whiteColor()])
         passwordField.attributedPlaceholder = NSAttributedString(string:"password",
             attributes:[NSForegroundColorAttributeName: UIColor.whiteColor()])
-        
+
         tapAwayRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
@@ -36,14 +36,14 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         // example of observer for NETWORK_STATUS_NOTIFICATION
         // NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectivityChanged", name: NETWORK_STATUS_NOTIFICATION, object: nil)
     }
-    
-//    func connectivityChanged() {
-//        print("LoginViewController.connectivityChanged to \(connectivityStatus)")
-//    }
-//
-//    deinit {
-//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NETWORK_STATUS_NOTIFICATION, object: nil)
-//    }
+
+    //    func connectivityChanged() {
+    //        print("LoginViewController.connectivityChanged to \(connectivityStatus)")
+    //    }
+    //
+    //    deinit {
+    //        NSNotificationCenter.defaultCenter().removeObserver(self, name: NETWORK_STATUS_NOTIFICATION, object: nil)
+    //    }
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -51,8 +51,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         activityIndicator.hidden = true
         emailField.becomeFirstResponder()
     }
-    
-    
+
+
     @IBAction func loginButtonTouch(sender: AnyObject) {
         if emailField.text!.isEmpty || passwordField.text!.isEmpty {
             notify("Please enter both your email and password.")
@@ -60,9 +60,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             attemptLogin()
         }
     }
-    
-    
-    
+
+
+
     @IBAction func signupButtonTouch(sender: AnyObject) {
         if emailField.text!.isEmpty || passwordField.text!.isEmpty {
             notify("Go ahead and enter your email and desired password.")
@@ -70,8 +70,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             attemptSignup()
         }
     }
-    
-    
+
+
     func attemptSignup() {
         self.view.endEditing(true)
         activityIndicator.hidden = false
@@ -126,37 +126,37 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             self.model.save()
             self.proceedToApp()
 
-//            if let error = error {
-//                var errorString = error.userInfo["error"] as! NSString
-//                let errorCode = error.userInfo["code"] as! Int
-//                if errorCode == 100 {
-//                    errorString = "Error: No network connection"
-//                } else if errorCode == 101 {
-//                    errorString = "Can't find that account. Double-check your email and password."
-//                } else if errorCode == 200 {
-//                    errorString = "Oops! You're missing your email."
-//                } else if errorCode == 201 {
-//                    errorString = "Oops! You're missing your password."
-//                } else if errorCode == 202 {
-//                    errorString = "Sorry, that email is already taken."
-//                } else if errorCode == 203 {
-//                    errorString = "Sorry, that email is already taken."
-//                } else if errorCode == 204 {
-//                    errorString = "Oops! You're missing your email"
-//                } else if errorCode == 125 {
-//                    errorString = "Oops! That's not a valid email."
-//                } else {
-//                    errorString = "Error: Signup failed"
-//                }
-//                // Show the errorString somewhere and let the user try again.
-//                print("\nerror code = \(errorCode)")
-//                self.displayError("\(errorString)")
-//            } else {
-//                // Hooray! Let them use the app now.
-//                self.model.user = User(parseUserObject: user, context: self.model.context)
-//                self.model.save()
-//                self.proceedToApp()
-//            }
+            //            if let error = error {
+            //                var errorString = error.userInfo["error"] as! NSString
+            //                let errorCode = error.userInfo["code"] as! Int
+            //                if errorCode == 100 {
+            //                    errorString = "Error: No network connection"
+            //                } else if errorCode == 101 {
+            //                    errorString = "Can't find that account. Double-check your email and password."
+            //                } else if errorCode == 200 {
+            //                    errorString = "Oops! You're missing your email."
+            //                } else if errorCode == 201 {
+            //                    errorString = "Oops! You're missing your password."
+            //                } else if errorCode == 202 {
+            //                    errorString = "Sorry, that email is already taken."
+            //                } else if errorCode == 203 {
+            //                    errorString = "Sorry, that email is already taken."
+            //                } else if errorCode == 204 {
+            //                    errorString = "Oops! You're missing your email"
+            //                } else if errorCode == 125 {
+            //                    errorString = "Oops! That's not a valid email."
+            //                } else {
+            //                    errorString = "Error: Signup failed"
+            //                }
+            //                // Show the errorString somewhere and let the user try again.
+            //                print("\nerror code = \(errorCode)")
+            //                self.displayError("\(errorString)")
+            //            } else {
+            //                // Hooray! Let them use the app now.
+            //                self.model.user = User(parseUserObject: user, context: self.model.context)
+            //                self.model.save()
+            //                self.proceedToApp()
+            //            }
         }
     }
 
@@ -170,7 +170,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         // populate Parse login
         let email = emailField.text!
         let password = passwordField.text!
-//        print("\nLogin: email=\(email), password=\(password)")
+        //        print("\nLogin: email=\(email), password=\(password)")
 
         PFUser.logInWithUsernameInBackground(email, password: password) {
             (user: PFUser?, error: NSError?) -> Void in
@@ -213,43 +213,43 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             self.model.save()
             self.proceedToApp()
 
-//            if user != nil {
-//                // Do stuff after successful login.
-//                self.model.user = User(parseUserObject: user!, context: self.model.context)
-//                self.model.save()
-//                self.proceedToApp()
-//            } else {
-//                // The login failed. Check error to see why.
-//                // TODO: replace with do-try-catch
-//                if let error = error {
-//                    self.activityIndicator.hidden = true
-//                    self.activityIndicator.stopAnimating()
-//                    var errorString = error.userInfo["error"] as! NSString
-//                    let errorCode = error.userInfo["code"] as! Int
-//                    if errorCode == 100 {
-//                        errorString = "Darn! No network connection"
-//                    } else if errorCode == 101 {
-//                        errorString = "Can't find that account. Double-check your email and password."
-//                    } else if errorCode == 200 {
-//                        errorString = "Oops! You're missing your email"
-//                    } else if errorCode == 201 {
-//                        errorString = "Oops! You're missing your password."
-//                    } else if errorCode == 204 {
-//                        errorString = "Oops! You're missing your email."
-//                    } else if errorCode == 205 {
-//                        errorString = "Oops. Can't find that account. Double-check your email."
-//                    } else if errorCode == 125 {
-//                        errorString = "Oops! That's not a valid email."
-//                    } else {
-//                        errorString = "Error: Login failed"
-//                    }
-//                    // Show the errorString somewhere and let the user try again.
-//                    print("\nerror code = \(errorCode)")
-//                    self.displayError("\(errorString)")
-//                } else {
-//                    print("no user or error", terminator: "")
-//                }
-//            }
+            //            if user != nil {
+            //                // Do stuff after successful login.
+            //                self.model.user = User(parseUserObject: user!, context: self.model.context)
+            //                self.model.save()
+            //                self.proceedToApp()
+            //            } else {
+            //                // The login failed. Check error to see why.
+            //                // TODO: replace with do-try-catch
+            //                if let error = error {
+            //                    self.activityIndicator.hidden = true
+            //                    self.activityIndicator.stopAnimating()
+            //                    var errorString = error.userInfo["error"] as! NSString
+            //                    let errorCode = error.userInfo["code"] as! Int
+            //                    if errorCode == 100 {
+            //                        errorString = "Darn! No network connection"
+            //                    } else if errorCode == 101 {
+            //                        errorString = "Can't find that account. Double-check your email and password."
+            //                    } else if errorCode == 200 {
+            //                        errorString = "Oops! You're missing your email"
+            //                    } else if errorCode == 201 {
+            //                        errorString = "Oops! You're missing your password."
+            //                    } else if errorCode == 204 {
+            //                        errorString = "Oops! You're missing your email."
+            //                    } else if errorCode == 205 {
+            //                        errorString = "Oops. Can't find that account. Double-check your email."
+            //                    } else if errorCode == 125 {
+            //                        errorString = "Oops! That's not a valid email."
+            //                    } else {
+            //                        errorString = "Error: Login failed"
+            //                    }
+            //                    // Show the errorString somewhere and let the user try again.
+            //                    print("\nerror code = \(errorCode)")
+            //                    self.displayError("\(errorString)")
+            //                } else {
+            //                    print("no user or error", terminator: "")
+            //                }
+            //            }
         }
     }
 
@@ -264,13 +264,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         }
     }
 
-    
+
     func displayError(errorString: String) {
         self.activityIndicator.hidden = true
         self.activityIndicator.stopAnimating()
         self.messageTextView.text = errorString
     }
-    
+
     func notify(message:String) {
         let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
@@ -281,7 +281,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         self.view.endEditing(true)
     }
     
-
+    
     
     /* text field delegate methods */
     
@@ -301,7 +301,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         }
         return true
     }
-
+    
     
 }
-

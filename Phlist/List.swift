@@ -13,7 +13,7 @@ import Parse
 
 class List : NSManagedObject {
 
-    @NSManaged var parseID: String?
+    @NSManaged var cloudID: String?
     @NSManaged var title: String
     @NSManaged var toBeDeleted: Bool
     @NSManaged var creationDate: NSDate
@@ -23,7 +23,7 @@ class List : NSManagedObject {
     @NSManaged var user: User
 
     let model = ModelController.one
-    var parseObject:PFObject?
+    var cloudObject:PFObject?
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -34,8 +34,8 @@ class List : NSManagedObject {
         let entity = NSEntityDescription.entityForName("List", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
 
-        self.parseObject = parseListObject
-        parseID = parseListObject.objectId!
+        self.cloudObject = parseListObject
+        cloudID = parseListObject.objectId!
         title = parseListObject["title"] as! String
         user = model.user!
         creationDate = parseListObject.createdAt!
