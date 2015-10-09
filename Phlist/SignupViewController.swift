@@ -71,14 +71,10 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
         activityIndicator.hidden = false
         activityIndicator.startAnimating()
 
-        let email = emailField.text!
-        let password = passwordField.text!
-        print("\nSign up: email=\(email), password=\(password)")
-
         let user = PFUser()
-        user.username = email
-        user.email = email
-        user.password = password
+        user.username = emailField.text!
+        user.email = emailField.text!
+        user.password = passwordField.text!
 
         user.signUpInBackgroundWithBlock {
             (succeeded: Bool, error: NSError?) -> Void in
@@ -88,6 +84,7 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
             guard succeeded else {
                 guard let error = error else {
                     print("unsuccessful, but no reported error")
+                    self.displayError("Error: Signup failed. Try again later.")
                     return
                 }
                 var errorString = error.userInfo["error"] as! NSString

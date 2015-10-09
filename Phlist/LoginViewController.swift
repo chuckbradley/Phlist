@@ -75,7 +75,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         // populate Parse login
         let email = emailField.text!
         let password = passwordField.text!
-        print("\nLogin: email=\(email), password=\(password)")
 
         PFUser.logInWithUsernameInBackground(email, password: password) {
             (user: PFUser?, error: NSError?) -> Void in
@@ -84,7 +83,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 // The login failed. Check error to see why.
                 guard let error = error else {
                     print("no user or error", terminator: "")
-                    self.displayError("Error: Login failed unexpectedly")
+                    self.displayError("Error: Login failed unexpectedly. Try again later.")
                     return
                 }
                 self.activityIndicator.hidden = true

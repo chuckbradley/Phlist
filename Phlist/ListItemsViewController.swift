@@ -18,7 +18,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     let model = ModelController.one
     var selectedItem:ListItem?
 
-    let PLACEHOLDER_IMAGE_NAME = "phlist-icon-grey"
+    let PLACEHOLDER_IMAGE_NAME = "phlist-placeholder"
     
     @IBOutlet weak var tableView: UITableView!
 

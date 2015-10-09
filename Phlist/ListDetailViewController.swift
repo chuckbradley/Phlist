@@ -44,10 +44,9 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         setFontName("OpenSans", forView: self.view, andSubViews: true)
         setFontName("Menlo-Regular", forView: emailField, andSubViews: false)
 
-        
         loadUsers()
-
     }
+
 
     // MARK: - Actions
     
