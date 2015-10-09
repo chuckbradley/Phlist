@@ -33,17 +33,8 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
 
-        // example of observer for NETWORK_STATUS_NOTIFICATION
-        // NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectivityChanged", name: NETWORK_STATUS_NOTIFICATION, object: nil)
     }
 
-    //    func connectivityChanged() {
-    //        print("LoginViewController.connectivityChanged to \(connectivityStatus)")
-    //    }
-    //
-    //    deinit {
-    //        NSNotificationCenter.defaultCenter().removeObserver(self, name: NETWORK_STATUS_NOTIFICATION, object: nil)
-    //    }
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -53,15 +44,7 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
     }
 
 
-    @IBAction func loginButtonTouch(sender: AnyObject) {
-        if emailField.text!.isEmpty || passwordField.text!.isEmpty {
-            notify("Please enter both your email and password.")
-        } else {
-            attemptLogin()
-        }
-    }
-
-
+    // MARK: - Actions
 
     @IBAction func signupButtonTouch(sender: AnyObject) {
         if emailField.text!.isEmpty || passwordField.text!.isEmpty {
@@ -71,6 +54,17 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
         }
     }
 
+    @IBAction func tapCancelButton(sender: AnyObject) {
+        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("Welcome") as! WelcomeViewController
+        self.presentViewController(controller, animated: true, completion: nil)
+    }
+
+    func tapAway(recognizer: UITapGestureRecognizer) {
+        self.view.endEditing(true)
+    }
+
+    
+    // MARK: - Operations
 
     func attemptSignup() {
         self.view.endEditing(true)
@@ -90,7 +84,7 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
             (succeeded: Bool, error: NSError?) -> Void in
             self.activityIndicator.hidden = true
             self.activityIndicator.stopAnimating()
-            // TODO: replace with do-try-catch
+
             guard succeeded else {
                 guard let error = error else {
                     print("unsuccessful, but no reported error")
@@ -122,134 +116,10 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
                 self.displayError("\(errorString)")
                 return
             }
+
             self.model.user = User(parseUserObject: user, context: self.model.context)
             self.model.save()
             self.proceedToApp()
-
-            //            if let error = error {
-            //                var errorString = error.userInfo["error"] as! NSString
-            //                let errorCode = error.userInfo["code"] as! Int
-            //                if errorCode == 100 {
-            //                    errorString = "Error: No network connection"
-            //                } else if errorCode == 101 {
-            //                    errorString = "Can't find that account. Double-check your email and password."
-            //                } else if errorCode == 200 {
-            //                    errorString = "Oops! You're missing your email."
-            //                } else if errorCode == 201 {
-            //                    errorString = "Oops! You're missing your password."
-            //                } else if errorCode == 202 {
-            //                    errorString = "Sorry, that email is already taken."
-            //                } else if errorCode == 203 {
-            //                    errorString = "Sorry, that email is already taken."
-            //                } else if errorCode == 204 {
-            //                    errorString = "Oops! You're missing your email"
-            //                } else if errorCode == 125 {
-            //                    errorString = "Oops! That's not a valid email."
-            //                } else {
-            //                    errorString = "Error: Signup failed"
-            //                }
-            //                // Show the errorString somewhere and let the user try again.
-            //                print("\nerror code = \(errorCode)")
-            //                self.displayError("\(errorString)")
-            //            } else {
-            //                // Hooray! Let them use the app now.
-            //                self.model.user = User(parseUserObject: user, context: self.model.context)
-            //                self.model.save()
-            //                self.proceedToApp()
-            //            }
-        }
-    }
-
-
-    func attemptLogin() {
-        self.messageTextView.text = ""
-        self.view.endEditing(true)
-        activityIndicator.hidden = false
-        activityIndicator.startAnimating()
-
-        // populate Parse login
-        let email = emailField.text!
-        let password = passwordField.text!
-        //        print("\nLogin: email=\(email), password=\(password)")
-
-        PFUser.logInWithUsernameInBackground(email, password: password) {
-            (user: PFUser?, error: NSError?) -> Void in
-            self.messageTextView.text = ""
-            guard user != nil else {
-                // The login failed. Check error to see why.
-                guard let error = error else {
-                    print("no user or error", terminator: "")
-                    self.displayError("Error: Login failed unexpectedly")
-                    return
-                }
-                self.activityIndicator.hidden = true
-                self.activityIndicator.stopAnimating()
-                var errorString = error.userInfo["error"] as! NSString
-                let errorCode = error.userInfo["code"] as! Int
-                if errorCode == 100 {
-                    errorString = "Darn! No network connection"
-                } else if errorCode == 101 {
-                    errorString = "Can't find that account. Double-check your email and password."
-                } else if errorCode == 200 {
-                    errorString = "Oops! You're missing your email"
-                } else if errorCode == 201 {
-                    errorString = "Oops! You're missing your password."
-                } else if errorCode == 204 {
-                    errorString = "Oops! You're missing your email."
-                } else if errorCode == 205 {
-                    errorString = "Oops. Can't find that account. Double-check your email."
-                } else if errorCode == 125 {
-                    errorString = "Oops! That's not a valid email."
-                } else {
-                    errorString = "Error: Login failed"
-                }
-                // Show the errorString somewhere and let the user try again.
-                print("\nerror code = \(errorCode)")
-                self.displayError("\(errorString)")
-                return
-            }
-            // Do stuff after successful login.
-            self.model.user = User(parseUserObject: user!, context: self.model.context)
-            self.model.save()
-            self.proceedToApp()
-
-            //            if user != nil {
-            //                // Do stuff after successful login.
-            //                self.model.user = User(parseUserObject: user!, context: self.model.context)
-            //                self.model.save()
-            //                self.proceedToApp()
-            //            } else {
-            //                // The login failed. Check error to see why.
-            //                // TODO: replace with do-try-catch
-            //                if let error = error {
-            //                    self.activityIndicator.hidden = true
-            //                    self.activityIndicator.stopAnimating()
-            //                    var errorString = error.userInfo["error"] as! NSString
-            //                    let errorCode = error.userInfo["code"] as! Int
-            //                    if errorCode == 100 {
-            //                        errorString = "Darn! No network connection"
-            //                    } else if errorCode == 101 {
-            //                        errorString = "Can't find that account. Double-check your email and password."
-            //                    } else if errorCode == 200 {
-            //                        errorString = "Oops! You're missing your email"
-            //                    } else if errorCode == 201 {
-            //                        errorString = "Oops! You're missing your password."
-            //                    } else if errorCode == 204 {
-            //                        errorString = "Oops! You're missing your email."
-            //                    } else if errorCode == 205 {
-            //                        errorString = "Oops. Can't find that account. Double-check your email."
-            //                    } else if errorCode == 125 {
-            //                        errorString = "Oops! That's not a valid email."
-            //                    } else {
-            //                        errorString = "Error: Login failed"
-            //                    }
-            //                    // Show the errorString somewhere and let the user try again.
-            //                    print("\nerror code = \(errorCode)")
-            //                    self.displayError("\(errorString)")
-            //                } else {
-            //                    print("no user or error", terminator: "")
-            //                }
-            //            }
         }
     }
 
@@ -265,6 +135,7 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
     }
 
 
+    // MARK: UI
     func displayError(errorString: String) {
         self.activityIndicator.hidden = true
         self.activityIndicator.stopAnimating()
@@ -276,27 +147,23 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
         alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
         self.presentViewController(alertController, animated: true, completion: nil)
     }
-    
-    func tapAway(recognizer: UITapGestureRecognizer) {
-        self.view.endEditing(true)
-    }
-    
-    
-    
-    /* text field delegate methods */
-    
+
+
+
+    // MARK: - Text field delegate
+
     func textFieldDidBeginEditing(textField: UITextField) {
         displayError("")
     }
-    
-    
+
+
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         if textField == emailField {
             passwordField.becomeFirstResponder()
         } else {
             textField.resignFirstResponder()
             if !emailField.text!.isEmpty && !passwordField.text!.isEmpty {
-                attemptLogin()
+                attemptSignup()
             }
         }
         return true
@@ -304,3 +171,4 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
     
     
 }
+

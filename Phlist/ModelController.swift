@@ -136,7 +136,7 @@ class ModelController {
             self.deleteUser()
         }
         // go to login screen
-        let controller = viewController.storyboard!.instantiateViewControllerWithIdentifier("Login") as! LoginViewController
+        let controller = viewController.storyboard!.instantiateViewControllerWithIdentifier("Welcome") as! WelcomeViewController
         viewController.presentViewController(controller, animated: true, completion: nil)
     }
     

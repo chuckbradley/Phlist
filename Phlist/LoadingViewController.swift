@@ -44,14 +44,8 @@ class LoadingViewController: UIViewController {
     }
 
     func proceedToLogin() {
-        performSegueWithIdentifier("showLogin", sender: self)
+        performSegueWithIdentifier("showWelcome", sender: self)
     }
-    
-//    func alert(message:String) {
-//        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
-//        alertController.addAction(UIAlertAction(title: "OK", style: .Default) { action in })
-//        self.presentViewController(alertController, animated: true, completion: nil)
-//    }
 
     
 //    func connectivityChanged() {
