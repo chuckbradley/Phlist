@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import CoreData
-import Parse
 
 
 class ListItemsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate, UITextFieldDelegate, ListItemCellDelegate {
@@ -44,42 +43,25 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
         fetchedResultsController.delegate = self
 
-        // temporary add-item UI
-        buildAddNewItemUI()
+        buildItemAdditionUI()
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
 
-        do {
-            try fetchedResultsController.performFetch()
-        } catch _ {
-        }
+    }
 
-        model.assignParseObjectToList(list) {
-            pfList, error in
-            if pfList != nil {
-                // syncronize items with cloud
-                self.model.syncItemsInList(self.list) {
-                    success, error in // are parameters even needed?
-                    do {
-                        try self.fetchedResultsController.performFetch()
-                    } catch _ {
-                    }
-                    self.tableView.reloadData()
-                }
-            } else {
-                do {
-                    // just use locally stored items
-                    try self.fetchedResultsController.performFetch()
-                } catch _ {
-                }
-                self.tableView.reloadData()
-            }
-        }
+    override func viewWillLayoutSubviews() {
+        tableView.delegate = self
+        tableView.sendSubviewToBack(self.refreshControl)
     }
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         selectedItem = nil
+        do {
+            try fetchedResultsController.performFetch()
+            tableView.reloadData()
+        } catch _ {
+        }
     }
 
 
@@ -109,7 +91,6 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
                 try self.fetchedResultsController.performFetch()
             } catch _ {
             }
-            self.tableView.reloadData()
             self.refreshControl.endRefreshing()
         }
     }
@@ -186,19 +167,19 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
 
-//    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-//        // Return false if you do not want the specified item to be editable.
-//        return true
-//    }
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        // Return false if you do not want the specified item to be editable.
+        return true
+    }
 
-//    func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-//        println("willSelectRowAtIndexPath")
-//        return indexPath
-//    }
+    func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+        print("willSelectRowAtIndexPath")
+        return indexPath
+    }
 
-//    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-//        println("didSelectRowAtIndexPath")
-//    }
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        print("didSelectRowAtIndexPath")
+    }
 
 
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
@@ -240,7 +221,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     // MARK: - Table Cell Delegate Actions
 
-    func nameTapped(item: ListItem) {
+    func listItemCellNameTapped(item: ListItem) {
         toggleItemActivation(item)
     }
 
@@ -258,18 +239,16 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
                 }
             }
         }
-        tableView.reloadData()
     }
     
-    func thumbnailTapped(item: ListItem) {
+    func listItemCellThumbnailTapped(item: ListItem) {
         selectedItem = item
-        model.loadParseItemForListItem(item) {
+        model.loadCloudItemForListItem(item) {
             pfItem, error in
             if error != nil {
                 print("thumbnailTapped error = \(error!.description)")
-            } else {
-                self.performSegueWithIdentifier("showItemDetail", sender: self)
             }
+            self.performSegueWithIdentifier("showItemDetail", sender: self)
         }
     }
     
@@ -297,8 +276,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
             cacheName: nil)
 
         return fetchedResultsController
-        
-        }()
+    }()
     
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
@@ -335,27 +313,18 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         self.tableView.endUpdates()
     }
     
-    /*
-    // Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
-    
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-    // In the simplest, most efficient, case, reload the table view.
-    self.tableView.reloadData()
-    }
-    */
     
     
+    // MARK: - Item Addition UI
     
-    // MARK: - UI
-    
-    var addNewItemPanel: UIView?
+    var itemAdditionPanel: UIView?
     var addNewItemButton: UIButton?
     var newItemNameField: UITextField?
     var dismissalPanel: UIView?
-    var addNewItemPanelDismisser:UITapGestureRecognizer?
+    var itemAdditionPanelDismisser:UITapGestureRecognizer?
     
     
-    func buildAddNewItemUI() {
+    func buildItemAdditionUI() {
         dismissalPanel = UIView(frame: CGRectMake(0, 0, view.bounds.width, view.bounds.height))
         dismissalPanel!.backgroundColor = UIColor.blackColor()
         dismissalPanel!.alpha = 0
@@ -363,8 +332,8 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(dismissalPanel!)
         
         // create panel
-        addNewItemPanel = UIView(frame: CGRectMake(0, -250, view.bounds.width, 54))
-        addNewItemPanel!.backgroundColor=UIColor.orangeColor()
+        itemAdditionPanel = UIView(frame: CGRectMake(0, -250, view.bounds.width, 54))
+        itemAdditionPanel!.backgroundColor=UIColor.orangeColor()
         
         // create text field
         newItemNameField = UITextField()
@@ -390,50 +359,50 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         addNewItemButton!.addTarget(self, action: "tapAddNewItemButton:", forControlEvents: UIControlEvents.TouchUpInside)
         
         // add field and button to panel and panel to parent view
-        addNewItemPanel!.addSubview(newItemNameField!)
-        addNewItemPanel!.addSubview(addNewItemButton!)
-        self.view.addSubview(addNewItemPanel!)
+        itemAdditionPanel!.addSubview(newItemNameField!)
+        itemAdditionPanel!.addSubview(addNewItemButton!)
+        self.view.addSubview(itemAdditionPanel!)
         
         // define gesture recognizer for dismissal of panel
-        addNewItemPanelDismisser = UITapGestureRecognizer(target: self, action: "dismissAddNewItemPanel")
+        itemAdditionPanelDismisser = UITapGestureRecognizer(target: self, action: "dismissItemAdditionPanel")
         
     }
     
     
-    func displayAddNewItemPanel() {
+    func displayItemAdditionPanel() {
         self.dismissalPanel!.hidden = false
         UIView.animateWithDuration(0.4,
             animations: {
-                self.addNewItemPanel!.frame.origin.y = 0
+                self.itemAdditionPanel!.frame.origin.y = 0
                 self.dismissalPanel!.alpha = 0.75
             },
             completion: {
                 _ in
-                self.dismissalPanel!.addGestureRecognizer(self.addNewItemPanelDismisser!)
+                self.dismissalPanel!.addGestureRecognizer(self.itemAdditionPanelDismisser!)
                 self.newItemNameField?.becomeFirstResponder()
                 
         })
     }
     
     
-    func dismissAddNewItemPanel() {
+    func dismissItemAdditionPanel() {
         self.newItemNameField!.resignFirstResponder()
         UIView.animateWithDuration(0.4,
             animations: {
-                self.addNewItemPanel!.frame.origin.y = -54
+                self.itemAdditionPanel!.frame.origin.y = -54
                 self.dismissalPanel!.alpha = 0
             },
             completion: {
                 _ in
                 self.newItemNameField!.text = ""
                 self.dismissalPanel!.hidden = true
-                self.dismissalPanel!.removeGestureRecognizer(self.addNewItemPanelDismisser!)
+                self.dismissalPanel!.removeGestureRecognizer(self.itemAdditionPanelDismisser!)
         })
     }
 
 
     func tapPlusButton(sender: AnyObject) {
-        displayAddNewItemPanel()
+        displayItemAdditionPanel()
     }
 
 
@@ -448,9 +417,8 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         if !newItemName.isEmpty {
             model.addItemWithName(newItemName, toList: list)
-            tableView.reloadData()
         }
-        dismissAddNewItemPanel()
+        dismissItemAdditionPanel()
     }
 
 

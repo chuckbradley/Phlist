@@ -14,7 +14,7 @@ class ActiveListItemCell: ListItemCell {
     
     @IBAction func thumbnailButtonTapped(sender: AnyObject) {
         guard let controller = self.delegate else { return }
-        controller.thumbnailTapped(self.listItem!)
+        controller.listItemCellThumbnailTapped(self.listItem!)
     }
     
 }

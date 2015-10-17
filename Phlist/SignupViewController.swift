@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import Parse
 import CoreData
 
 
@@ -21,6 +20,9 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
 
     var tapAwayRecognizer: UITapGestureRecognizer? = nil
     let model = ModelController.one
+
+
+    // MARK: - Lifecycle Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,24 +73,18 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
         activityIndicator.hidden = false
         activityIndicator.startAnimating()
 
-        let user = PFUser()
-        user.username = emailField.text!
-        user.email = emailField.text!
-        user.password = passwordField.text!
-
-        user.signUpInBackgroundWithBlock {
-            (succeeded: Bool, error: NSError?) -> Void in
+        model.signUp(emailField.text!, password: passwordField.text!) {
+            success, error in
             self.activityIndicator.hidden = true
             self.activityIndicator.stopAnimating()
-
-            guard succeeded else {
-                guard let error = error else {
-                    print("unsuccessful, but no reported error")
-                    self.displayError("Error: Signup failed. Try again later.")
-                    return
-                }
-                var errorString = error.userInfo["error"] as! NSString
-                let errorCode = error.userInfo["code"] as! Int
+            if success {
+                self.proceedToApp()
+            } else if error == nil {
+                print("unsuccessful, but no reported error")
+                self.displayError("Error: Signup failed. Try again later.")
+            } else {
+                var errorString = error!.userInfo["error"] as! NSString
+                let errorCode = error!.code
                 if errorCode == 100 {
                     errorString = "Error: No network connection"
                 } else if errorCode == 101 {
@@ -108,17 +104,67 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
                 } else {
                     errorString = "Error: Signup failed"
                 }
-                // Show the errorString somewhere and let the user try again.
+                // Show the errorString and let the user try again.
                 print("\nerror code = \(errorCode)")
                 self.displayError("\(errorString)")
-                return
             }
-
-            self.model.user = User(parseUserObject: user, context: self.model.context)
-            self.model.save()
-            self.proceedToApp()
         }
     }
+
+
+//    func attemptSignup() {
+//        self.view.endEditing(true)
+//        activityIndicator.hidden = false
+//        activityIndicator.startAnimating()
+//
+//        let user = PFUser()
+//        user.username = emailField.text!
+//        user.email = emailField.text!
+//        user.password = passwordField.text!
+//
+//        user.signUpInBackgroundWithBlock {
+//            (succeeded: Bool, error: NSError?) -> Void in
+//            self.activityIndicator.hidden = true
+//            self.activityIndicator.stopAnimating()
+//
+//            guard succeeded else {
+//                guard let error = error else {
+//                    print("unsuccessful, but no reported error")
+//                    self.displayError("Error: Signup failed. Try again later.")
+//                    return
+//                }
+//                var errorString = error.userInfo["error"] as! NSString
+//                let errorCode = error.userInfo["code"] as! Int
+//                if errorCode == 100 {
+//                    errorString = "Error: No network connection"
+//                } else if errorCode == 101 {
+//                    errorString = "Can't find that account. Double-check your email and password."
+//                } else if errorCode == 200 {
+//                    errorString = "Oops! You're missing your email."
+//                } else if errorCode == 201 {
+//                    errorString = "Oops! You're missing your password."
+//                } else if errorCode == 202 {
+//                    errorString = "Sorry, that email is already taken."
+//                } else if errorCode == 203 {
+//                    errorString = "Sorry, that email is already taken."
+//                } else if errorCode == 204 {
+//                    errorString = "Oops! You're missing your email"
+//                } else if errorCode == 125 {
+//                    errorString = "Oops! That's not a valid email."
+//                } else {
+//                    errorString = "Error: Signup failed"
+//                }
+//                // Show the errorString somewhere and let the user try again.
+//                print("\nerror code = \(errorCode)")
+//                self.displayError("\(errorString)")
+//                return
+//            }
+//
+//            self.model.user = User(cloudUserObject: user, context: self.model.context)
+//            self.model.save()
+//            self.proceedToApp()
+//        }
+//    }
 
 
     func proceedToApp() {
@@ -130,21 +176,6 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
             self.presentViewController(controller, animated: true, completion: nil)
         }
     }
-
-
-    // MARK: UI
-    func displayError(errorString: String) {
-        self.activityIndicator.hidden = true
-        self.activityIndicator.stopAnimating()
-        self.messageTextView.text = errorString
-    }
-
-    func notify(message:String) {
-        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
-        self.presentViewController(alertController, animated: true, completion: nil)
-    }
-
 
 
     // MARK: - Text field delegate
@@ -165,7 +196,21 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
         }
         return true
     }
-    
+
+
+    // MARK: - Utilities
+    func displayError(errorString: String) {
+        self.activityIndicator.hidden = true
+        self.activityIndicator.stopAnimating()
+        self.messageTextView.text = errorString
+    }
+
+    func notify(message:String) {
+        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
+        self.presentViewController(alertController, animated: true, completion: nil)
+    }
+
     
 }
 

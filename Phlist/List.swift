@@ -22,6 +22,7 @@ class List : NSManagedObject {
     @NSManaged var items: [ListItem]
     @NSManaged var user: User
 
+    // session variables
     let model = ModelController.one
     var cloudObject:PFObject?
 
@@ -30,15 +31,15 @@ class List : NSManagedObject {
     }
 
     // init from saved parse list object
-    init(parseListObject:PFObject, context: NSManagedObjectContext) {
+    init(cloudListObject:PFObject, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("List", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
 
-        self.cloudObject = parseListObject
-        cloudID = parseListObject.objectId!
-        title = parseListObject["title"] as! String
+        self.cloudObject = cloudListObject
+        cloudID = cloudListObject.objectId!
+        title = cloudListObject["title"] as! String
         user = model.user!
-        creationDate = parseListObject.createdAt!
+        creationDate = cloudListObject.createdAt!
         modificationDate = NSDate()
         toBeDeleted = false
         synchronizationDate = NSDate()

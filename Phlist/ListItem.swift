@@ -27,34 +27,33 @@ class ListItem : NSManagedObject {
     @NSManaged var photoFilename: String // local filename
     @NSManaged var hasPhoto: Bool
     
-    // session variable
+    // session variables
     var cloudObject:PFObject?
     let model = ModelController.one
     let cache = ModelController.imageCache
-    var photoLoaded = false
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
     // init from parse item object
-    init(parseItemObject:PFObject, list: List, context: NSManagedObjectContext) {
+    init(cloudItemObject:PFObject, list: List, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("ListItem", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
 
         self.list = list
-        cloudID = parseItemObject.objectId!
-        cloudObject = parseItemObject
-        name = parseItemObject["name"] as! String
+        cloudID = cloudItemObject.objectId!
+        cloudObject = cloudItemObject
+        name = cloudItemObject["name"] as! String
         searchText = self.name.lowercaseString
-        active = parseItemObject["active"] as! Bool
+        active = cloudItemObject["active"] as! Bool
         toBeDeleted = false
-        creationDate = parseItemObject.createdAt!
+        creationDate = cloudItemObject.createdAt!
         modificationDate = NSDate()
         synchronizationDate = NSDate()
 
-        hasPhoto = parseItemObject["hasPhoto"] as! Bool
-        photoFilename = hasPhoto ? parseItemObject["photoFilename"] as! String : ""
+        hasPhoto = cloudItemObject["hasPhoto"] as! Bool
+        photoFilename = hasPhoto ? cloudItemObject["photoFilename"] as! String : ""
     }
 
     init(name:String, list: List, context: NSManagedObjectContext) {

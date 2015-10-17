@@ -23,12 +23,12 @@ class User : NSManagedObject {
     }
     
     // init from parse list object
-    init(parseUserObject:PFUser, context: NSManagedObjectContext) {
+    init(cloudUserObject:PFUser, context: NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("User", inManagedObjectContext: context)!
         super.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        self.cloudID = parseUserObject.objectId!
-        self.email = parseUserObject.email!
+        self.cloudID = cloudUserObject.objectId!
+        self.email = cloudUserObject.email!
     }
     
 }

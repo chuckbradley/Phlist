@@ -8,7 +8,6 @@
 
 import UIKit
 import Foundation
-import Parse
 import CoreData
 
 
@@ -22,6 +21,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     var tapAwayRecognizer: UITapGestureRecognizer? = nil
     let model = ModelController.one
 
+
+    // MARK: - Lifecycle Methods
+
     override func viewDidLoad() {
         super.viewDidLoad()
         emailField.attributedPlaceholder = NSAttributedString(string:"email",
@@ -34,7 +36,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         setFontName("OpenSans", forView: self.view, andSubViews: true)
 
     }
-    
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -72,24 +73,24 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         activityIndicator.hidden = false
         activityIndicator.startAnimating()
 
-        // populate Parse login
         let email = emailField.text!
         let password = passwordField.text!
 
-        PFUser.logInWithUsernameInBackground(email, password: password) {
-            (user: PFUser?, error: NSError?) -> Void in
+        model.logIn(email, password: password) {
+            success, error in
             self.messageTextView.text = ""
-            guard user != nil else {
-                // The login failed. Check error to see why.
-                guard let error = error else {
-                    print("no user or error", terminator: "")
-                    self.displayError("Error: Login failed unexpectedly. Try again later.")
-                    return
-                }
-                self.activityIndicator.hidden = true
-                self.activityIndicator.stopAnimating()
-                var errorString = error.userInfo["error"] as! NSString
-                let errorCode = error.userInfo["code"] as! Int
+            self.activityIndicator.hidden = true
+            self.activityIndicator.stopAnimating()
+            if success {
+                self.proceedToApp()
+            } else if error == nil {
+                print("no user or error")
+                self.displayError("Error: Login failed unexpectedly. Try again later.")
+                return
+            } else {
+                var errorString = error!.userInfo["error"] as! NSString
+                let errorCode = error!.code
+                // let errorCode = error!.userInfo["code"] as! Int
                 if errorCode == 100 {
                     errorString = "Darn! No network connection"
                 } else if errorCode == 101 {
@@ -112,10 +113,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 self.displayError("\(errorString)")
                 return
             }
-            // after successful login:
-            self.model.user = User(parseUserObject: user!, context: self.model.context)
-            self.model.save()
-            self.proceedToApp()
         }
     }
 
@@ -138,21 +135,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
 
 
-    // MARK: UI
-    func displayError(errorString: String) {
-        self.activityIndicator.hidden = true
-        self.activityIndicator.stopAnimating()
-        self.messageTextView.text = errorString
-    }
-    
-    func notify(message:String) {
-        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
-        self.presentViewController(alertController, animated: true, completion: nil)
-    }
-    
-
-
     // MARK: - Text field delegate
     
     func textFieldDidBeginEditing(textField: UITextField) {
@@ -172,6 +154,19 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         return true
     }
 
-    
+    // MARK: - Utilities
+
+    func displayError(errorString: String) {
+        self.activityIndicator.hidden = true
+        self.activityIndicator.stopAnimating()
+        self.messageTextView.text = errorString
+    }
+
+    func notify(message:String) {
+        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
+        self.presentViewController(alertController, animated: true, completion: nil)
+    }
+
 }
 

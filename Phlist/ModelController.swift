@@ -34,8 +34,6 @@ class ModelController {
 
     // MARK: - Global
 
-    let domain = "com.freedommind.phlist"
-
     var context: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
@@ -110,7 +108,8 @@ class ModelController {
 
         return nil
     }
-    
+
+
     func deleteUser() {
         if _user != nil {
             context.deleteObject(_user!)
@@ -118,14 +117,14 @@ class ModelController {
             _user = nil
         }
     }
-    
+
+
     func logout(viewController:UIViewController) {
         // delete stored data
         let lists = loadStoredLists()
         for list in lists {
             let items = loadStoredItemsForList(list)
             for item in items {
-//                item.photoImageData = nil // remove photo file
                 context.deleteObject(item)
             }
             context.deleteObject(list)
@@ -139,85 +138,49 @@ class ModelController {
         let controller = viewController.storyboard!.instantiateViewControllerWithIdentifier("Welcome") as! WelcomeViewController
         viewController.presentViewController(controller, animated: true, completion: nil)
     }
-    
- 
-    
-    // MARK: - General Object
-    
-//    
-//    // remove user's email from corresponding cloud object's editors array
-//    // and delete cloud object if no editors remain
-//    func removeUserAsEditorFromCloudItem(pfItem: PFObject) {
-//        let email = self.user!.email
-//        if let editors = pfItem["editors"] as? [String] {
-//            var editorList = editors
-//
-//            if let edx = find(editorList, email) {
-//                editorList.removeAtIndex(edx)
-//            }
-//
-//            if editorList.isEmpty { // if this user was only one, remove item
-//                if pfItem["photo"] == nil {
-//                    // if no photo, go ahead and remove pfItem from Parse
-//                    pfItem.deleteEventually()
-//                    println("parseItem deleteEventually")
-//                } else { // if pfItem has a photo stored,
-//                    // replace photo in cloud with single pixel...
-//                    let pixel = UIImage(named: "singlePixel")
-//                    let imageData = UIImagePNGRepresentation(pixel!)
-//                    pfItem["photo"] = PFFile(name:"pixel.png", data: imageData)
-//                    pfItem.saveInBackgroundWithBlock {
-//                        success, error in
-//                        // after replacing image, delete pfItem from Parse
-//                        pfItem.deleteEventually()
-//                        println("parseItem with image deleteEventually")
-//                    }
-//                }
-//            } else { // if other editors exist,
-//                // just replace editors array with new one without current user
-//                pfItem["editors"] = editorList
-//                pfItem.saveEventually()
-//                println("user removed from parseItem, saveEventually")
-//            }
-//
-//        }
-//    }
-//    
-//
-//    // remove user's email from corresponding cloud list's editors array
-//    // and delete cloud list if no editors remain
-//    func removeUserAsEditorFromCloudList(pfList: PFObject) {
-//        let email = self.user!.email
-//        if let editors = pfList["editors"] as? [String] {
-//            if let users = pfList["acceptedBy"] as? [String] {
-//                var editorList = editors
-//                var userList = users
-//                
-//                if let edx = find(editorList, email) {
-//                    editorList.removeAtIndex(edx)
-//                }
-//                
-//                if let udx = find(userList, email) {
-//                    userList.removeAtIndex(udx)
-//                }
-//
-//                if userList.isEmpty {
-//                    pfList.deleteEventually()
-//                    println("parseList deleteEventually")
-//                } else {
-//                    pfList["editors"] = editorList
-//                    pfList["acceptedBy"] = userList
-//                    pfList.saveEventually()
-//                    println("user removed from parseList, saveEventually")
-//                }
-//                
-//            }
-//        }
-//    }
 
+    func requestPasswordResetForEmailInBackground(email:String, handler: (success: Bool, error: NSError?) -> Void) {
+        PFUser.requestPasswordResetForEmailInBackground(email, block: handler)
+    }
+
+
+    func logIn(email: String, password: String, handler: (success: Bool, error: NSError?) -> Void) -> Void {
+        PFUser.logInWithUsernameInBackground(email, password: password) {
+            (user: PFUser?, error: NSError?) -> Void in
+            if user != nil {
+                self.user = User(cloudUserObject: user!, context: self.context)
+                self.save()
+                handler(success: true, error: nil)
+            } else {
+                handler(success: false, error: error)
+            }
+        }
+    }
+
+
+    func signUp(email: String, password: String, handler: (success: Bool, error: NSError?) -> Void) -> Void {
+        let user = PFUser()
+        user.username = email
+        user.email = email
+        user.password = password
+        user.signUpInBackgroundWithBlock {
+            (succeeded: Bool, error: NSError?) -> Void in
+            if succeeded {
+                self.user = User(cloudUserObject: user, context: self.context)
+                self.save()
+            }
+            handler(success: succeeded, error: error)
+        }
+    }
     
-    
-    
+
+
+
+
+
+
+    // MARK: - General Object
+
     
     // remove user's email from corresponding cloud object's editors array
     // and delete cloud object if no editors remain
@@ -293,53 +256,7 @@ class ModelController {
             
         }
     }
-    
-    
-    
-    
-    
-    
-    
-//
-//    // remove user's email from corresponding cloud object's editors array
-//    // and delete cloud object if no editors remain
-//    func removeUserAsEditorFromObject(object: PFObject) {
-//        if let editors = object["editors"] as? [String] {
-//            var editorList = editors
-//            for (index, value) in enumerate(editorList) { // enumerate through array of editors
-//                if value == self.user!.email { // until current user is found
-//                    editorList.removeAtIndex(index) // remove current user from array
-//                    if editorList.isEmpty { // if user was only editor...
-//                        if object["photo"] == nil {
-//                            // if no photo, go ahead and remove object from Parse
-//                            object.deleteEventually()
-//                            println("parseItem deleteEventually")
-//                        } else { // if object has a photo stored,
-//                            // replace photo in cloud with single pixel...
-//                            let pixel = UIImage(named: "singlePixel")
-//                            let imageData = UIImagePNGRepresentation(pixel!)
-//                            object["photo"] = PFFile(name:"pixel.png", data: imageData)
-//                            object.saveInBackgroundWithBlock {
-//                                success, error in
-//                                // after replacing image, delete object from Parse
-//                                object.deleteEventually()
-//                                println("parseItem with image deleteEventually")
-//                            }
-//                        }
-//                    } else { // if other editors exist,
-//                        // just replace editors array with new one without current user
-//                        object["editors"] = editorList
-//                        object.saveEventually()
-//                        println("user removed from parseItem, saveEventually")
-//                    }
-//                    break
-//                }
-//            }
-//        }
-//    }
-//    
 
-    
 
     // add user's email to corresponding cloud object's editors array
     func addUserAsEditorToCloudObject(cloudObject: PFObject, handler: ((success: Bool, error: NSError?) -> Void)?) {
@@ -349,7 +266,6 @@ class ModelController {
         if let editors = cloudObject["editors"] as? [String] {
             var editorList = editors
             if !editorList.contains(email) {
-//            if editorList.indexOf(email) == nil {
                 editorList.append(email)
                 cloudObject["editors"] = editorList
                 changed = true
@@ -363,7 +279,6 @@ class ModelController {
             if let members = cloudObject["acceptedBy"] as? [String] {
                 var memberList = members
                 if !memberList.contains(email) {
-//                if memberList.indexOf(email) == nil {
                     memberList.append(email)
                     cloudObject["acceptedBy"] = memberList
                     changed = true
@@ -397,11 +312,11 @@ class ModelController {
     // create local list and corresponding cloud list with title
     func addListWithTitle(title:String) {
         // create PFObject
-        let pfList = PFObject(className: "List")
-        pfList["title"] = title
-        pfList["deleted"] = false
-        pfList["editors"] = [self.user!.email]
-        pfList["acceptedBy"] = [self.user!.email]
+        let cloudList = PFObject(className: "List")
+        cloudList["title"] = title
+        cloudList["deleted"] = false
+        cloudList["editors"] = [self.user!.email]
+        cloudList["acceptedBy"] = [self.user!.email]
         
         // create basic List object
         let list = List(title: title, context: context)
@@ -410,33 +325,27 @@ class ModelController {
         // save PFObject
         if connectivityStatus == NOT_REACHABLE {
             // wait until later to sync
-            pfList.saveEventually {
+            cloudList.saveEventually {
                 (success: Bool, error: NSError?) -> Void in
                 if (success) {
                     // update List object with cloud data
-                    list.cloudID = pfList.objectId!
-                    list.creationDate = pfList.createdAt!
+                    list.cloudID = cloudList.objectId!
+                    list.creationDate = cloudList.createdAt!
                     list.updateModificationDate()
                     list.updateSynchronizationDate()
                     self.save()
-                } else {
-                    // TODO: handle saving-error
-                    print("Error saving parse object - pfList.saveEventually")
                 }
             }
         } else {
-            pfList.saveInBackgroundWithBlock {
+            cloudList.saveInBackgroundWithBlock {
                 (success: Bool, error: NSError?) -> Void in
                 if (success) {
                     // update List object with cloud data
-                    list.cloudID = pfList.objectId!
-                    list.creationDate = pfList.createdAt!
+                    list.cloudID = cloudList.objectId!
+                    list.creationDate = cloudList.createdAt!
                     list.updateModificationDate()
                     list.updateSynchronizationDate()
                     self.save()
-                } else {
-                    // TODO: handle saving-error
-                    print("Error saving parse object - pfList.saveInBackground")
                 }
             }
         }
@@ -444,19 +353,30 @@ class ModelController {
 
     
     // create list in cloud from List object
-    func createParseListFromList(list: List) {
-        let pfList = PFObject(className: "List")
-        pfList["title"] = list.title
-        pfList["deleted"] = false
-        pfList["editors"] = [self.user!.email]
+    func createCloudListFromList(list: List) {
+        let cloudList = PFObject(className: "List")
+        cloudList["title"] = list.title
+        cloudList["deleted"] = false
+        cloudList["editors"] = [self.user!.email]
         if list.items.count > 0 {
-            // TODO: add list items to cloud?
-            print("\(list.title) has \(list.items.count) items")
+            // add list items to cloud
+            var doSave = false
+            for item in list.items {
+                if item.toBeDeleted {
+                    self.context.deleteObject(item)
+                    doSave = true
+                } else {
+                    self.createCloudItemFromListItem(item, andItemIsNew: false)
+                }
+            }
+            if doSave {
+                self.save()
+            }
         }
-        pfList.saveInBackgroundWithBlock{
+        cloudList.saveInBackgroundWithBlock{
             success, error in
             if success {
-                list.cloudID = pfList.objectId!
+                list.cloudID = cloudList.objectId!
                 list.updateModificationDate()
                 list.updateSynchronizationDate()
                 self.save()
@@ -469,30 +389,29 @@ class ModelController {
     func syncLists(completionHandler: (success: Bool, error: NSError?) -> Void) {
         if connectivityStatus == NOT_REACHABLE {
             print("syncLists error: connectivityStatus == NOT_REACHABLE")
-            let error = NSError(domain: self.domain, code: 100, userInfo: nil)
+            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
             completionHandler(success: false, error: error)
         } else {
-            var newLists = [PFObject]()
-            var pfListDict = [String:PFObject]()
-            let cdLists = loadStoredLists()
-            loadParseLists {
-                pfLists, error in
+            loadCloudLists {
+                cloudLists, error in
+                var newLists = [PFObject]()
+                var cloudListDict = [String:PFObject]()
+                let storedLists = self.loadStoredLists()
                 if error != nil {
                     // error - synchronization not possible
-                    // TODO: handle error
                     completionHandler(success: false, error: error!)
                 } else {
-                    if pfLists!.isEmpty {
-                        for list in cdLists {
+                    if cloudLists!.isEmpty {
+                        for list in storedLists {
                             if list.toBeDeleted {
                                 self.context.deleteObject(list)
                                 self.save()
                             } else {
-                                self.createParseListFromList(list)
+                                self.createCloudListFromList(list)
                             }
                         }
-                    } else if cdLists.isEmpty {
-                        for cloudList in pfLists! {
+                    } else if storedLists.isEmpty {
+                        for cloudList in cloudLists! {
                             if (cloudList["deleted"] as! Bool) {
                                 self.removeUserAsEditorFromCloudObject(cloudList)
                             } else {
@@ -501,32 +420,32 @@ class ModelController {
                         }
                     } else { // lists exist locally and in cloud
                         // build a referenceable dictionary with the returned lists
-                        for list in pfLists! {
-                            pfListDict[list.objectId!] = list
+                        for list in cloudLists! {
+                            cloudListDict[list.objectId!] = list
                         }
                         // for all the stored lists...
-                        for list in cdLists {
+                        for list in storedLists {
                             // if it has a cloudID...
                             if let cloudID = list.cloudID {
-                                // if there is a pflist with that id, pull it from the dictionary...
-                                if let pfList = pfListDict.removeValueForKey(cloudID) {
+                                // if there is a cloudList with that id, pull it from the dictionary...
+                                if let cloudList = cloudListDict.removeValueForKey(cloudID) {
                                     // if it needs to be deleted...
                                     if list.toBeDeleted {
                                         // remove this user as an editor and delete local list
-                                        self.removeUserAsEditorFromCloudObject(pfList)
+                                        self.removeUserAsEditorFromCloudObject(cloudList)
                                         self.context.deleteObject(list)
                                     } else {
                                         // synchronize list data
                                         let syncDate = list.synchronizationDate!
                                         let modDate = list.modificationDate
-                                        let cloudDate = pfList.updatedAt!
-                                        list.cloudObject = pfList
+                                        let cloudDate = cloudList.updatedAt!
+                                        list.cloudObject = cloudList
 
                                         if modDate.compare(syncDate) == .OrderedDescending || cloudDate.compare(syncDate) == .OrderedDescending {
                                             if modDate.compare(cloudDate) == .OrderedDescending { // local is newer
-                                                self.applyDataOfList(list, toParseList: pfList)
+                                                self.applyDataOfList(list, toCloudList: cloudList)
                                             } else { // cloud is newer
-                                                self.applyDataOfParseList(pfList, toList: list)
+                                                self.applyDataOfCloudList(cloudList, toList: list)
                                             }
                                         }
                                     }
@@ -543,13 +462,13 @@ class ModelController {
                                     self.context.deleteObject(list)
                                     self.save()
                                 } else {
-                                    // create a parseList in the cloud
-                                    self.createParseListFromList(list)
+                                    // create a cloudList in the cloud
+                                    self.createCloudListFromList(list)
                                 }
                             }
                         }
-                        // add all remaining parse lists to newLists
-                        for list in pfListDict.values {
+                        // add all remaining cloud lists to newLists array
+                        for list in cloudListDict.values {
                             newLists.append(list)
                         }
                     }
@@ -562,10 +481,10 @@ class ModelController {
     
     
     // retreive user's lists from cloud
-    func loadParseLists(handler: (lists:[PFObject]?, error: NSError?)->Void) -> Void {
+    func loadCloudLists(handler: (lists:[PFObject]?, error: NSError?)->Void) -> Void {
         if connectivityStatus == NOT_REACHABLE {
-            print("loadParseLists error: connectivityStatus == NOT_REACHABLE")
-            let error = NSError(domain: "com.freedommind.phlist", code: 100, userInfo: nil)
+            print("loadCloudLists error: connectivityStatus == NOT_REACHABLE")
+            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
             handler(lists: nil, error: error)
         } else {
             let query = PFQuery(className:"List")
@@ -573,7 +492,7 @@ class ModelController {
             query.findObjectsInBackgroundWithBlock {
                 (objects: [AnyObject]?, error: NSError?) -> Void in
                 if error == nil {
-                    // println("retrieved \(objects!.count) lists from Parse")
+                    // println("retrieved \(objects!.count) lists from cloud")
                     if let objects = objects as? [PFObject] {
                         handler(lists: objects, error: nil)
                     }
@@ -610,38 +529,38 @@ class ModelController {
 
     
     // confirm or obtain the corresponding cloud list for given list
-    func assignParseObjectToList(list: List, handler: (parseList: PFObject?, error: NSError?) -> Void) {
+    func assignCloudObjectToList(list: List, handler: (cloudList: PFObject?, error: NSError?) -> Void) {
         if list.cloudObject != nil {
-            handler(parseList: list.cloudObject!, error: nil)
-        } else if list.cloudID != nil {
+            handler(cloudList: list.cloudObject!, error: nil)
+        } else if list.cloudID == nil {
+            // list not yet synced - no cloudObject available
+            handler(cloudList: nil, error: nil)
+        } else {
             if connectivityStatus == NOT_REACHABLE {
-                let error = NSError(domain: self.domain, code: 100, userInfo: nil)
-                handler(parseList: nil, error: error)
+                let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
+                handler(cloudList: nil, error: error)
             } else {
                 let query = PFQuery(className:"List")
                 query.getObjectInBackgroundWithId(list.cloudID!) {
-                    pfList, error in
-                    if pfList != nil {
-                        list.cloudObject = pfList!
-                        handler(parseList: pfList!, error: nil)
+                    cloudList, error in
+                    if cloudList != nil {
+                        list.cloudObject = cloudList!
+                        handler(cloudList: cloudList!, error: nil)
                     } else if error != nil {
-                        handler(parseList: nil, error: error!)
+                        handler(cloudList: nil, error: error!)
                     }
                 }
             }
-        } else {
-            // list not yet synced - no cloudObject available
-            handler(parseList: nil, error: nil)
         }
     }
 
 
 
-    func applyDataOfList(list:List, toParseList pfList:PFObject) {
+    func applyDataOfList(list:List, toCloudList cloudList:PFObject) {
         // apply all modifiable properties:
-        pfList["title"] = list.title
+        cloudList["title"] = list.title
 
-        pfList.saveInBackgroundWithBlock{
+        cloudList.saveInBackgroundWithBlock{
             success, error in
             if success {
                 list.updateSynchronizationDate()
@@ -650,55 +569,110 @@ class ModelController {
         }
     }
 
-    func applyDataOfParseList(pfList:PFObject, toList list:List) {
+    func applyDataOfCloudList(cloudList:PFObject, toList list:List) {
         // apply all modifiable properties:
-        list.title = pfList["title"] as! String
+        list.title = cloudList["title"] as! String
 
         list.updateSynchronizationDate()
         save()
     }
 
 
-
-    // retrieve cloud list for local list
-    func updateParseListForList(list: List, handler: (pfList: PFObject?, error: NSError?) -> Void) {
-        if let pfList = list.cloudObject { // if the list already has a cloudObject...
-            pfList.fetchInBackgroundWithBlock(handler) // make sure it is up to date
-        } else {
-            assignParseObjectToList(list, handler: handler)
-        }
-    }
-
-
     // invite new user (email) to list
     func inviteAddress(email: String, forList list: List, handler: (success: Bool, error: NSError?) -> Void) {
-        if let pfList = list.cloudObject {
-            var editors = pfList["editors"] as! [String]
+        if let cloudList = list.cloudObject {
+            var editors = cloudList["editors"] as! [String]
             editors.append(email)
-            pfList["editors"] = editors
-            pfList.saveInBackgroundWithBlock (handler)
+            cloudList["editors"] = editors
+            cloudList.saveInBackgroundWithBlock (handler)
         }
     }
 
 
     // confirm user's acceptance of new lists
     func importNewCloudLists(cloudLists:[PFObject]) {
-        for pfList in cloudLists {
-            if let acceptedBy = pfList["acceptedBy"] as? [String] {
+        let invitationsAvailable = invitations.isEmpty ? true : false
+        var cloudListIDs = [String]()
+        for cloudList in cloudLists {
+            if let acceptedBy = cloudList["acceptedBy"] as? [String] {
                 // if already accepted (app is repopulating) no confirmation needed
-                if acceptedBy.contains(self.user!.email) {
-//                if acceptedBy.indexOf(self.user!.email) != nil {
-                    _ = List(parseListObject: pfList, context: self.context)
+                if acceptedBy.contains(self.user!.email) { // if user has already accepted the list
+                    _ = List(cloudListObject: cloudList, context: self.context)
                     self.save()
-                } else { // if user hasn't already accepted the list, it's an invitation
-                    if !invitations.contains(pfList) {
-//                    if invitations.indexOf(pfList) == nil {
-                        invitations.append(pfList)
+                } else if invitationsAvailable { // if user hasn't yet accepted and invitations haven't already been defined
+                    if !cloudListIDs.contains(cloudList.objectId!) { // prevent duplicates
+//                    if !invitations.contains(cloudList) { // prevent duplication
+                        invitations.append(cloudList)
                     }
                 }
             }
+            cloudListIDs.append(cloudList.objectId!)
         }
     }
+
+
+    func loadUserGroupsForList(list:List, handler: (userArrays: (users:[String], editors:[String]), error: NSError?) -> Void) {
+        if let cloudList = list.cloudObject {
+            let userArrays = extractUserArraysFromCloudList(cloudList)
+            if userArrays.users.isEmpty {
+                handler(
+                    userArrays: userArrays,
+                    error: NSError(
+                        domain: APP_DOMAIN,
+                        code: 101,
+                        userInfo: [NSLocalizedDescriptionKey: "No users found"])
+                )
+            } else {
+                handler(userArrays: userArrays, error: nil)
+            }
+        } else {
+            handler(userArrays: ([], []), error: nil)
+        }
+    }
+
+
+    func updateUserGroupsForList(list:List, handler: (userArrays: (users:[String], editors:[String]), error: NSError?) -> Void) {
+        updateCloudListForList(list) {
+            cloudList, error in
+            if let cloudList = list.cloudObject {
+                let userArrays = self.extractUserArraysFromCloudList(cloudList)
+                if userArrays.users.isEmpty {
+                    handler(
+                        userArrays: userArrays,
+                        error: NSError(
+                            domain: APP_DOMAIN,
+                            code: 101,
+                            userInfo: [NSLocalizedDescriptionKey: "No users found"])
+                    )
+                } else {
+                    handler(userArrays: userArrays, error: nil)
+                }
+            } else {
+                handler(userArrays: ([],[]), error: error)
+            }
+        }
+    }
+
+
+    // retrieve cloud list for local list
+    func updateCloudListForList(list: List, handler: (cloudList: PFObject?, error: NSError?) -> Void) {
+        if let cloudList = list.cloudObject { // if the list already has a cloudObject...
+            cloudList.fetchInBackgroundWithBlock(handler) // make sure it is up to date
+        } else {
+            assignCloudObjectToList(list, handler: handler)
+        }
+    }
+
+
+    func extractUserArraysFromCloudList(cloudList: PFObject) -> (users:[String], editors:[String]) {
+        guard let editors = cloudList["editors"] as? [String] else { return ([], []) }
+        guard let users = cloudList["acceptedBy"] as? [String] else { return ([], editors) }
+        let editorSet = Set(editors)
+        let inviteeSet = editorSet.exclusiveOr(Set(users))
+        let invitees = Array(inviteeSet)
+        return (users, invitees)
+    }
+
 
     // confirm user's acceptance of new lists
     func confirmInvitationsFromController(controller: UIViewController, confirmationHandler: (confirmed:Bool) -> Void) {
@@ -725,12 +699,18 @@ class ModelController {
         alertController.addAction(destroyAction)
         
         let joinAction = UIAlertAction(title: "Yes", style: .Default) { (action) in
-            for _ in self.invitations {
-                let cloudList:PFObject = self.invitations.removeFirst()
-                _ = List(parseListObject: cloudList, context: self.context)
+            for cloudList in self.invitations {
+                _ = List(cloudListObject: cloudList, context: self.context)
                 self.save()
                 self.addUserAsEditorToCloudObject(cloudList, handler: nil)
             }
+            self.invitations = []
+//            for _ in self.invitations {
+//                let cloudList:PFObject = self.invitations.removeFirst()
+//                _ = List(cloudListObject: cloudList, context: self.context)
+//                self.save()
+//                self.addUserAsEditorToCloudObject(cloudList, handler: nil)
+//            }
             confirmationHandler(confirmed: true)
         }
         alertController.addAction(joinAction)
@@ -768,34 +748,6 @@ class ModelController {
                 if let hdlr = handler { hdlr() }
             }
         }
-
-//        if let cloudID = list.cloudID {
-//            // flag for deletion (now or later)
-//            list.toBeDeleted = true
-//            list.updateModificationDate()
-//            save()
-//            if let object = list.cloudObject {
-//                self.removeUserAsEditorFromCloudObject(object)
-//                self.context.deleteObject(list)
-//                self.save()
-//                if let hdlr = handler { hdlr() }
-//            } else if connectivityStatus != NOT_REACHABLE {
-//                PFQuery(className:"List").getObjectInBackgroundWithId(cloudID) {
-//                    object, error in
-//                    if object != nil {
-//                        self.removeUserAsEditorFromCloudObject(object!)
-//                        self.context.deleteObject(list)
-//                        self.save()
-//                    }
-//                    if let hdlr = handler { hdlr() }
-//                }
-//            }
-//        } else {
-//            context.deleteObject(list)
-//            save()
-//            if let hdlr = handler { hdlr() }
-//        }
-
     }
 
 
@@ -840,145 +792,169 @@ class ModelController {
         save()
 
         // create PFObject
-        let pfItem = PFObject(className: "ListItem")
-        pfItem["name"] = name
-        pfItem["deleted"] = false
-        pfItem["editors"] = [self.user!.email]
-        pfItem["active"] = item.active
-        pfItem["hasPhoto"] = item.hasPhoto
-        pfItem["photoFilename"] = item.photoFilename
-        
-        // associate item with parent list
-        if let pfList = list.cloudObject {
-            pfItem["list"] = pfList
-        }
+        createCloudItemFromListItem(item, andItemIsNew: true)
 
-        // save PFObject
-        if connectivityStatus == NOT_REACHABLE {
-            // wait until later to sync
-            pfItem.saveEventually {
-                success, error in
-                if success {
-                    print("item \"\(name)\" has been saved to list \(list.title) with id: \(pfItem.objectId!)")
-                    item.cloudID = pfItem.objectId!
-                    item.creationDate = pfItem.createdAt!
-                    item.updateSynchronizationDate()
-                    self.save()
-                } else {
-                    // TODO: handle saving-error
-                    // There was a problem, check error.description
-                    print("Error saving parse object: addItemWithName:toList: saveEventually")
-                }
-            }
-        } else {
-            pfItem.saveInBackgroundWithBlock {
-                success, error in
-                if success {
-                    print("item \"\(name)\" has been saved to list \(list.title) with id: \(pfItem.objectId!)")
-                    item.cloudID = pfItem.objectId!
-                    item.creationDate = pfItem.createdAt!
-                    item.updateSynchronizationDate()
-                    self.save()
-                } else {
-                    // TODO: handle saving-error
-                    // There was a problem, check error.description
-                    print("Error saving parse object: addItemWithName:toList: saveInBackground")
-                }
-            }
-        }
+//        let cloudItem = PFObject(className: "ListItem")
+//        cloudItem["name"] = name
+//        cloudItem["deleted"] = false
+//        cloudItem["editors"] = [self.user!.email]
+//        cloudItem["active"] = item.active
+//        cloudItem["hasPhoto"] = item.hasPhoto
+//        cloudItem["photoFilename"] = item.photoFilename
+//        
+//        // associate cloud item with parent cloud list
+//        if let cloudList = list.cloudObject {
+//            cloudItem["list"] = cloudList
+//            saveNewCloudItem(cloudItem, forItem: item, andItemIsNew: true)
+//        } else {
+//            assignCloudObjectToList(list) {
+//                cloudList, error in
+//                if cloudList != nil {
+//                    cloudItem["list"] = cloudList
+//                    self.saveNewCloudItem(cloudItem, forItem: item, andItemIsNew: true)
+//                }
+//            }
+//        }
     }
 
 
-    // create cloud item from local item
-    func createParseListItemFromListItem(item: ListItem) {
-        // create PFObject
-        let pfItem = PFObject(className: "ListItem")
-        pfItem["name"] = item.name
-        pfItem["deleted"] = false
-        pfItem["editors"] = [self.user!.email]
-        pfItem["active"] = item.active
-        pfItem["hasPhoto"] = item.hasPhoto
-        pfItem["photoFilename"] = item.photoFilename
-        if item.hasPhoto && item.photoImageData != nil {
-            pfItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
-        }
-        // associate item with parent list
-        if let pfList = item.list.cloudObject {
-            pfItem["list"] = pfList
-        }
-        pfItem.saveInBackgroundWithBlock {
-            success, error in
-            if success {
-                item.cloudID = pfItem.objectId!
-                item.updateSynchronizationDate()
-                item.cloudObject = pfItem
-                self.save()
+    // save newly created cloud item corresponding to 
+    func saveNewCloudItem(cloudItem:PFObject, forItem item:ListItem, andItemIsNew isNew:Bool) {
+        if connectivityStatus == NOT_REACHABLE {
+            // wait until later to sync
+            cloudItem.saveEventually {
+                success, error in
+                if success {
+                    print("item \"\(item.name)\" has been saved to list \(item.list.title) with id: \(cloudItem.objectId!)")
+                    item.cloudID = cloudItem.objectId!
+                    item.cloudObject = cloudItem
+                    if isNew {
+                        item.creationDate = cloudItem.createdAt!
+                    }
+                    item.updateSynchronizationDate()
+                    self.save()
+                } else {
+                    print("Error saving cloud object: saveNewCloudItem: saveEventually")
+                }
+            }
+        } else {
+            cloudItem.saveInBackgroundWithBlock {
+                success, error in
+                if success {
+                    print("item \"\(item.name)\" has been saved to list \(item.list.title) with id: \(cloudItem.objectId!)")
+                    item.cloudID = cloudItem.objectId!
+                    item.cloudObject = cloudItem
+                    if isNew {
+                        item.creationDate = cloudItem.createdAt!
+                    }
+                    item.updateSynchronizationDate()
+                    self.save()
+                } else {
+                    print("Error saving cloud object: saveNewCloudItem: saveInBackground")
+                }
             }
         }
+
+    }
+
+    // create cloud item from local item
+    func createCloudItemFromListItem(item: ListItem, andItemIsNew isNew:Bool) {
+        // create PFObject
+        let cloudItem = PFObject(className: "ListItem")
+        cloudItem["name"] = item.name
+        cloudItem["deleted"] = false
+        cloudItem["editors"] = [self.user!.email]
+        cloudItem["active"] = item.active
+        cloudItem["hasPhoto"] = item.hasPhoto
+        cloudItem["photoFilename"] = item.photoFilename
+        if item.hasPhoto && item.photoImageData != nil {
+            cloudItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
+        }
+        // associate item with parent list
+        if let cloudList = item.list.cloudObject {
+            cloudItem["list"] = cloudList
+            saveNewCloudItem(cloudItem, forItem: item, andItemIsNew: isNew)
+        } else {
+            assignCloudObjectToList(item.list) {
+                cloudList, error in
+                if cloudList != nil {
+                    cloudItem["list"] = cloudList
+                    self.saveNewCloudItem(cloudItem, forItem: item, andItemIsNew: isNew)
+                }
+            }
+        }
+//        cloudItem.saveInBackgroundWithBlock {
+//            success, error in
+//            if success {
+//                item.cloudID = cloudItem.objectId!
+//                item.cloudObject = cloudItem
+//                item.updateSynchronizationDate()
+//                item.cloudObject = cloudItem
+//                self.save()
+//            }
+//        }
     }
 
     
     // synchronize local items and cloud items for given list
     func syncItemsInList(list: List, completionHandler: (success: Bool, error: NSError?) -> Void) {
         var newCloudItems = [PFObject]()
-        var pfItemDict = [String:PFObject]()
-        let cdItems = loadStoredItemsForList(list)
+        var cloudItemDict = [String:PFObject]()
+        let storedItems = loadStoredItemsForList(list)
         if connectivityStatus == NOT_REACHABLE {
             print("syncItemsInList error: connectivityStatus == NOT_REACHABLE")
-            // TODO: learn about NSError
-            let error = NSError(domain: self.domain, code: 100, userInfo: nil)
+            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
             completionHandler(success: false, error: error)
         } else {
-            loadParseItemsForList(list) {
-                pfItems, error in
+            loadCloudItemsForList(list) {
+                cloudItems, error in
                 if error != nil {
                     // error - synchronization not possible
-                    // TODO: handle error
                     completionHandler(success: false, error: error!)
                 } else {
-                    if pfItems!.isEmpty {
-                        for item in cdItems {
+                    if cloudItems!.isEmpty {
+                        for item in storedItems {
                             if item.toBeDeleted {
                                 self.context.deleteObject(item)
                                 self.save()
                             } else {
-                                self.createParseListItemFromListItem(item)
+                                self.createCloudItemFromListItem(item, andItemIsNew: false)
                             }
                         }
                     }
-                    else if cdItems.isEmpty {
-                        for pfItem in pfItems! {
-                            if pfItem["deleted"] as! Bool {
-                                self.removeUserAsEditorFromCloudObject(pfItem)
+                    else if storedItems.isEmpty {
+                        for cloudItem in cloudItems! {
+                            if cloudItem["deleted"] as! Bool {
+                                self.removeUserAsEditorFromCloudObject(cloudItem)
                             } else {
-                                newCloudItems.append(pfItem)
+                                newCloudItems.append(cloudItem)
                             }
                         }
                     }
                     else {
-                        for pfItem in pfItems! {
-                            pfItemDict[pfItem.objectId!] = pfItem
+                        for cloudItem in cloudItems! {
+                            cloudItemDict[cloudItem.objectId!] = cloudItem
                         }
-                        for item in cdItems {
+                        for item in storedItems {
                             if item.cloudID != nil { // if item has ever been synced...
-                                if let pfItem = pfItemDict.removeValueForKey(item.cloudID!) {
-                                    if (pfItem["deleted"] as! Bool) || item.toBeDeleted {
-                                        pfItem["deleted"] = true
-                                        self.removeUserAsEditorFromCloudObject(pfItem)
+                                if let cloudItem = cloudItemDict.removeValueForKey(item.cloudID!) {
+                                    if (cloudItem["deleted"] as! Bool) || item.toBeDeleted {
+                                        cloudItem["deleted"] = true
+                                        self.removeUserAsEditorFromCloudObject(cloudItem)
                                         self.context.deleteObject(item)
                                         self.save()
                                     } else {
-                                        item.cloudObject = pfItem
+                                        item.cloudObject = cloudItem
                                         let syncDate = item.synchronizationDate
                                         let modDate = item.modificationDate
-                                        let cloudDate = pfItem.updatedAt!
+                                        let cloudDate = cloudItem.updatedAt!
                                         
                                         if modDate.compare(syncDate) == .OrderedDescending || cloudDate.compare(syncDate) == .OrderedDescending {
                                             // apply item data from newer to older source
                                             if modDate.compare(cloudDate) == .OrderedDescending { // local is newer
-                                                self.applyDataOfItem(item, toParseItem: pfItem)
+                                                self.applyDataOfItem(item, toCloudItem: cloudItem)
                                             } else { // cloud is newer
-                                                self.applyDataOfParseItem(pfItem, toItem: item)
+                                                self.applyDataOfCloudItem(cloudItem, toItem: item)
                                             }
                                         }
                                     }
@@ -991,27 +967,26 @@ class ModelController {
                                     self.context.deleteObject(item)
                                     self.save()
                                 } else {
-                                    self.createParseListItemFromListItem(item)
+                                    self.createCloudItemFromListItem(item, andItemIsNew: false)
                                 }
                             }
                         }
-                        for pfItem in pfItemDict.values {
-                            if !(pfItem["deleted"] as! Bool) {
-                                newCloudItems.append(pfItem)
+                        for cloudItem in cloudItemDict.values {
+                            if !(cloudItem["deleted"] as! Bool) {
+                                newCloudItems.append(cloudItem)
                             }
                         }
                     }
-                    for pfItem in newCloudItems {
-                        let item = ListItem(parseItemObject: pfItem, list: list, context: self.context)
-//                        self.save()
-                        self.addUserAsEditorToCloudObject(pfItem) {
+                    for cloudItem in newCloudItems {
+                        let item = ListItem(cloudItemObject: cloudItem, list: list, context: self.context)
+                        self.addUserAsEditorToCloudObject(cloudItem) {
                             success, error in
                             if error != nil {
                                 print("syncItemsInList: error adding user as editor to new list")
                             }
                         }
                         if item.hasPhoto {
-                            self.downloadPhotoFromParseListItem(pfItem, toListItem: item)
+                            self.downloadPhotoFromCloudItem(cloudItem, toItem: item)
                         }
                     }
                     self.save()
@@ -1044,12 +1019,12 @@ class ModelController {
     
 
     // retreive cloud items for local list
-    func loadParseItemsForList(list: List, handler: (items:[PFObject]?, error: NSError?) -> Void) {
+    func loadCloudItemsForList(list: List, handler: (items:[PFObject]?, error: NSError?) -> Void) {
         if connectivityStatus == NOT_REACHABLE {
-            let error = NSError(domain: self.domain, code: 100, userInfo: nil)
+            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
             handler(items: nil, error: error)
-        } else if let pfList = list.cloudObject {
-            self.loadCloudItemsForCloudList(pfList, filteredForUser: false, handler: handler)
+        } else if let cloudList = list.cloudObject {
+            self.loadCloudItemsForCloudList(cloudList, filteredForUser: false, handler: handler)
         }
     }
 
@@ -1057,7 +1032,7 @@ class ModelController {
     // retreive cloud items for cloud list
     func loadCloudItemsForCloudList(cloudList: PFObject, filteredForUser: Bool, handler: (items:[PFObject]?, error: NSError?) -> Void) {
         if connectivityStatus == NOT_REACHABLE {
-            let error = NSError(domain: self.domain, code: 100, userInfo: nil)
+            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
             handler(items: nil, error: error)
         } else {
             let query = PFQuery(className:"ListItem")
@@ -1086,26 +1061,26 @@ class ModelController {
     
 
     // retrieve cloud item for local item
-    func loadParseItemForListItem(item: ListItem, handler: (pfItem: PFObject?, error: NSError?) -> Void) {
-        if let pfItem = item.cloudObject {
-            handler(pfItem: pfItem, error: nil)
+    func loadCloudItemForListItem(item: ListItem, handler: (cloudItem: PFObject?, error: NSError?) -> Void) {
+        if let cloudItem = item.cloudObject {
+            handler(cloudItem: cloudItem, error: nil)
         } else if connectivityStatus == NOT_REACHABLE {
-            print("loadParseItemForListItem error: connectivityStatus == NOT_REACHABLE")
-            let error = NSError(domain: self.domain, code: 100, userInfo: nil)
-            handler(pfItem: nil, error: error)
+            print("loadCloudItemForListItem error: connectivityStatus == NOT_REACHABLE")
+            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
+            handler(cloudItem: nil, error: error)
         } else if let id = item.cloudID {
             let query = PFQuery(className:"ListItem")
             query.getObjectInBackgroundWithId(id) {
-                pfItem, error in
-                if pfItem != nil {
-                    item.cloudObject = pfItem!
-                    handler(pfItem: pfItem!, error: nil)
+                cloudItem, error in
+                if cloudItem != nil {
+                    item.cloudObject = cloudItem!
+                    handler(cloudItem: cloudItem!, error: nil)
                 } else {
-                    handler(pfItem: nil, error: error)
+                    handler(cloudItem: nil, error: error)
                 }
             }
         } else {
-            handler(pfItem: nil, error: nil)
+            handler(cloudItem: nil, error: nil)
         }
         
     }
@@ -1116,15 +1091,15 @@ class ModelController {
         item.searchText = name.lowercaseString
         item.updateModificationDate()
         save()
-        if let pfItem = item.cloudObject {
-            self.applyDataOfItem(item, toParseItem: pfItem)
+        if let cloudItem = item.cloudObject {
+            self.applyDataOfItem(item, toCloudItem: cloudItem)
         } else {
-            loadParseItemForListItem(item) {
-                pfItem, error in
-                if pfItem != nil {
-                    self.applyDataOfItem(item, toParseItem: pfItem!)
+            loadCloudItemForListItem(item) {
+                cloudItem, error in
+                if cloudItem != nil {
+                    self.applyDataOfItem(item, toCloudItem: cloudItem!)
                 } else if error == nil {
-                    self.createParseListItemFromListItem(item)
+                    self.createCloudItemFromListItem(item, andItemIsNew: false)
                 }
             }
         }
@@ -1132,32 +1107,34 @@ class ModelController {
 
     
     func assignNewPhotoImage(image:UIImage, toItem item: ListItem) {
-        item.hasPhoto = true
+        if item.hasPhoto {
+            item.photoImage = nil
+        }
         item.modificationDate = NSDate()
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
         let filename = dateFormatter.stringFromDate(item.modificationDate)
         item.photoFilename = "\(filename).jpg"
+        item.hasPhoto = true
         save()
-        item.photoImage = nil
         item.photoImage = image
-        if let pfItem = item.cloudObject {
-            self.applyDataOfItem(item, toParseItem: pfItem)
+        if let cloudItem = item.cloudObject {
+            self.applyDataOfItem(item, toCloudItem: cloudItem)
         } else {
-            loadParseItemForListItem(item) {
-                pfItem, error in
-                if pfItem != nil {
-                    self.applyDataOfItem(item, toParseItem: pfItem!)
+            loadCloudItemForListItem(item) {
+                cloudItem, error in
+                if cloudItem != nil {
+                    self.applyDataOfItem(item, toCloudItem: cloudItem!)
                 } else if error == nil {
-                    self.createParseListItemFromListItem(item)
+                    self.createCloudItemFromListItem(item, andItemIsNew: false)
                 }
             }
         }
     }
     
     
-    func downloadPhotoFromParseListItem(pfItem: PFObject, toListItem item: ListItem) {
-        if let file = pfItem["photo"] as? PFFile {
+    func downloadPhotoFromCloudItem(cloudItem: PFObject, toItem item: ListItem) {
+        if let file = cloudItem["photo"] as? PFFile {
             file.getDataInBackgroundWithBlock {
                 data, error in
                 if data != nil {
@@ -1171,20 +1148,20 @@ class ModelController {
     }
 
 
-    func applyDataOfItem(item:ListItem, toParseItem pfItem:PFObject) {
+    func applyDataOfItem(item:ListItem, toCloudItem cloudItem:PFObject) {
         if item.cloudObject == nil {
-            item.cloudObject = pfItem
+            item.cloudObject = cloudItem
         }
         // apply all modifiable properties:
-        pfItem["name"] = item.name
-        pfItem["active"] = item.active
-        pfItem["hasPhoto"] = item.hasPhoto
-        pfItem["photoFilename"] = item.photoFilename
+        cloudItem["name"] = item.name
+        cloudItem["active"] = item.active
+        cloudItem["hasPhoto"] = item.hasPhoto
+        cloudItem["photoFilename"] = item.photoFilename
         if item.hasPhoto && item.photoImageData != nil {
-            pfItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
+            cloudItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
         }
 
-        pfItem.saveInBackgroundWithBlock{
+        cloudItem.saveInBackgroundWithBlock{
             success, error in
             if success {
                 item.updateSynchronizationDate()
@@ -1194,21 +1171,21 @@ class ModelController {
     }
     
 
-    func applyDataOfParseItem(pfItem:PFObject, toItem item:ListItem) {
+    func applyDataOfCloudItem(cloudItem:PFObject, toItem item:ListItem) {
         if item.cloudObject == nil {
-            item.cloudObject = pfItem
+            item.cloudObject = cloudItem
         }
         // apply all modifiable properties:
-        item.name = pfItem["name"] as! String
+        item.name = cloudItem["name"] as! String
         item.searchText = item.name.lowercaseString
-        item.active = pfItem["active"] as! Bool
-        item.hasPhoto = pfItem["hasPhoto"] as! Bool
+        item.active = cloudItem["active"] as! Bool
+        item.hasPhoto = cloudItem["hasPhoto"] as! Bool
 
         if item.hasPhoto {
-            if let pfPhotoFilename = pfItem["photoFilename"] as? String {
+            if let pfPhotoFilename = cloudItem["photoFilename"] as? String {
                 if item.photoFilename != pfPhotoFilename {
                     item.photoFilename = pfPhotoFilename
-                    if let imageFile = pfItem["photo"] as? PFFile {
+                    if let imageFile = cloudItem["photo"] as? PFFile {
                         imageFile.getDataInBackgroundWithBlock {
                             data, error in
                             if data != nil {
@@ -1237,27 +1214,28 @@ class ModelController {
     func removeItem(item:ListItem) {
         item.toBeDeleted = true
         item.updateModificationDate()
+        item.photoImage = nil
         if connectivityStatus == NOT_REACHABLE {
             save()
             print("item marked toBeDeleted because no connection")
-        } else if let pfItem = item.cloudObject {
-            pfItem["deleted"] = true
-            removeUserAsEditorFromCloudObject(pfItem)
+        } else if let cloudItem = item.cloudObject {
+            cloudItem["deleted"] = true
+            removeUserAsEditorFromCloudObject(cloudItem)
             context.deleteObject(item)
             save()
             print("item deleted")
         } else {
-            loadParseItemForListItem(item) {
-                pfItem, error in
-                if pfItem != nil {
-                    pfItem!["deleted"] = true
-                    self.removeUserAsEditorFromCloudObject(pfItem!)
+            loadCloudItemForListItem(item) {
+                cloudItem, error in
+                if cloudItem != nil {
+                    cloudItem!["deleted"] = true
+                    self.removeUserAsEditorFromCloudObject(cloudItem!)
                     self.context.deleteObject(item)
                     self.save()
-                    print("item deleted after loading parseItem")
+                    print("item deleted after loading cloud item")
                 } else {
                     self.save()
-                    print("item marked toBeDeleted because parseItem didn't load")
+                    print("item marked toBeDeleted because cloud item didn't load")
                 }
             }
         }

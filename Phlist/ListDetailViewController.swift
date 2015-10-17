@@ -8,7 +8,6 @@
 
 import UIKit
 import Foundation
-import Parse
 import CoreData
 
 
@@ -26,6 +25,7 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     @IBOutlet weak var listNameLabel: UILabel!
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var inviteButton: UIButton!
+
 
     // MARK: - Lifecycle Methods
 
@@ -62,33 +62,28 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: - Cloud Interaction
 
     func loadUsers() {
-        if let cloudList = list.cloudObject {
-            populateTables(cloudList)
+        model.loadUserGroupsForList(list) {
+            userArrays, error in
+            self.populateTableData((userArrays.users, userArrays.editors))
         }
-        model.updateParseListForList(list) {
-            cloudList, error in
-            if let cloudList = cloudList {
-                self.populateTables(cloudList)
-            } else if error != nil {
+        model.updateUserGroupsForList(list) {
+            userArrays, error in
+            if error != nil {
                 if error!.code == 100 {
-                    print("loadUsers: connectivity error")
                     self.displayModalWithMessage("There is no network connection. Try again later.", andTitle: "Error")
                 } else {
-                    print("loadUsers: error")
                     self.displayModalWithMessage("There was some sort of problem. Try again later.", andTitle: "Error")
                 }
+            } else {
+                self.populateTableData((userArrays.users, userArrays.editors))
             }
         }
+
     }
 
-
-    func populateTables(cloudList:PFObject) {
-        guard let users = cloudList["acceptedBy"] as? [String] else { return }
-        guard let editors = cloudList["editors"] as? [String] else { return }
-        self.users = users
-        let editorSet = Set(editors)
-        let inviteeSet = editorSet.exclusiveOr(Set(self.users))
-        self.invitees = Array(inviteeSet)
+    func populateTableData(userArrays: (users:[String], invitees:[String])) {
+        self.users = userArrays.users
+        self.invitees = userArrays.invitees
         self.usersTable.reloadData()
         self.inviteesTable.reloadData()
     }
@@ -142,28 +137,21 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        if tableView == inviteesTable {
-            let cell = tableView.dequeueReusableCellWithIdentifier("InviteeCell", forIndexPath: indexPath) 
-            self.configureInviteeCell(cell, atIndexPath: indexPath)
-            return cell
-        } else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("UserCell", forIndexPath: indexPath) 
-            self.configureUserCell(cell, atIndexPath: indexPath)
-            return cell
-        }
-    }
-    
-    func configureUserCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
-        let email = users[indexPath.row] as String
+
+        let cell = tableView == inviteesTable ?
+            tableView.dequeueReusableCellWithIdentifier("InviteeCell", forIndexPath: indexPath) :
+            tableView.dequeueReusableCellWithIdentifier("UserCell", forIndexPath: indexPath)
+
+        let email = tableView == inviteesTable ?
+            (invitees[indexPath.row] as String) :
+            (users[indexPath.row] as String)
+
         cell.textLabel!.text = email
         setFontName("Menlo-Regular", forView: cell, andSubViews: true)
+
+        return cell
     }
 
-    func configureInviteeCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
-        let email = invitees[indexPath.row] as String
-        cell.textLabel!.text = email
-        setFontName("Menlo-Regular", forView: cell, andSubViews: true)
-    }
 
 
     // MARK: - Utility

@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 
+let APP_DOMAIN = "com.freedommind.phlist"
 
 
 func setFontName(fontName:String, forView view: UIView, andSubViews subViews: Bool) {

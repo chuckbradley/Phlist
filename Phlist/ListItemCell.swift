@@ -9,8 +9,8 @@
 import UIKit
 
 protocol ListItemCellDelegate {
-    func nameTapped(item:ListItem)
-    func thumbnailTapped(item:ListItem)
+    func listItemCellNameTapped(item:ListItem)
+    func listItemCellThumbnailTapped(item:ListItem)
 }
 
 class ListItemCell: UITableViewCell {
@@ -22,7 +22,7 @@ class ListItemCell: UITableViewCell {
 
     @IBAction func nameButtonTapped(sender: AnyObject) {
         guard let controller = self.delegate else { return }
-        controller.nameTapped(listItem!)
+        controller.listItemCellNameTapped(listItem!)
     }
 
 }

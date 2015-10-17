@@ -57,6 +57,8 @@ class ImageDataCache {
     
     // store data for given image with given identifier and optional jpg compression
     func storeDataForImage(image: UIImage?, withIdentifier identifier: String, withCompression useJpg: Bool) {
+        // if method is called with empty identifier, return nil
+        guard !identifier.isEmpty else { return }
         let path = pathForIdentifier(identifier)
         // If the image is nil, remove existing image from the cache and directory
         if image == nil {
@@ -75,6 +77,8 @@ class ImageDataCache {
     
     // store given data with given identifier
     func storeImageData(data: NSData?, withIdentifier identifier: String) {
+        // if method is called with empty identifier, return nil
+        guard !identifier.isEmpty else { return }
         let path = pathForIdentifier(identifier)
         // If the image is nil, remove existing image from the cache and directory
         if data == nil {
@@ -89,7 +93,8 @@ class ImageDataCache {
         dataCache.setObject(data!, forKey: path)
         data!.writeToFile(path, atomically: true)
     }
-    
+
+
     // MARK: - Deletion
     
     // delete all files in document directory

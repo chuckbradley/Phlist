@@ -34,16 +34,20 @@ class Connectivity: NSObject {
         }
 
         // observe kReachabilityChangedNotification (defined in Reachability.h)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: kReachabilityChangedNotification, object: nil)
-        
+        NSNotificationCenter.defaultCenter().addObserver(self,
+            selector: "reachabilityChanged:",
+            name: kReachabilityChangedNotification,
+            object: nil)
     }
+
 
     func reachabilityChanged(notification: NSNotification) {
         if let reachability = notification.object as? Reachability {
             self.statusChangedWithReachability(reachability)
         }
     }
-    
+
+
     func statusChangedWithReachability(reachability: Reachability) {
         let networkStatus: NetworkStatus = reachability.currentReachabilityStatus()
         
@@ -54,15 +58,34 @@ class Connectivity: NSObject {
         } else if networkStatus.rawValue == ReachableViaWWAN.rawValue {
             connectivityStatus = REACHABLE_WITH_WWAN
         }
-        // println("Connectivity changed to \(networkStatus.value): \(connectivityStatus)")
-        
+
         NSNotificationCenter.defaultCenter().postNotificationName(NETWORK_STATUS_NOTIFICATION, object: nil)
     }
 
     deinit {
-        print("deinit Connectivity")
+        print("\ndeinit Connectivity")
         NSNotificationCenter.defaultCenter().removeObserver(self, name: kReachabilityChangedNotification, object: nil)
     }
+
+
+
+/* to add observer for NETWORK_STATUS_NOTIFICATION:
+
+// in viewDidLoad or didFinishLaunching...
+     NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectivityChanged", name: NETWORK_STATUS_NOTIFICATION, object: nil)
+
+// add handler method:
+    func connectivityChanged() {
+        // do something with the connectivityStatus...
+        print("connectivityChanged to \(connectivityStatus)")
+    }
+
+// in deinit:
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: NETWORK_STATUS_NOTIFICATION, object: nil)
+    }
+
+*/
 
 
 }

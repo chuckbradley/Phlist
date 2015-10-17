@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-import Parse
 import CoreData
 
 
@@ -21,6 +20,9 @@ class PasswordResetViewController: UIViewController, UITextFieldDelegate {
     var tapAwayRecognizer: UITapGestureRecognizer? = nil
     let model = ModelController.one
     var fromLogin = false
+
+
+    // MARK: - Lifecycle Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,6 +67,8 @@ class PasswordResetViewController: UIViewController, UITextFieldDelegate {
     }
 
 
+    // MARK: - Operations
+
     func returnToLogin() {
         let controller = self.storyboard!.instantiateViewControllerWithIdentifier("Login") as! LoginViewController
         self.presentViewController(controller, animated: true, completion: nil)
@@ -75,21 +79,17 @@ class PasswordResetViewController: UIViewController, UITextFieldDelegate {
         self.presentViewController(controller, animated: true, completion: nil)
     }
 
-
-    // MARK: - Operations
-
     func requestReset() {
         self.messageTextView.text = ""
         self.view.endEditing(true)
         activityIndicator.hidden = false
         activityIndicator.startAnimating()
 
-        // populate Parse login
         let email = emailField.text!
 
         print("\nRequested password reset for \(email)")
 
-        PFUser.requestPasswordResetForEmailInBackground(email) {
+        model.requestPasswordResetForEmailInBackground(email) {
             success, error in
 
             self.messageTextView.text = ""
@@ -131,23 +131,6 @@ class PasswordResetViewController: UIViewController, UITextFieldDelegate {
     }
 
 
-
-
-    // MARK: UI
-    func displayMessage(errorString: String) {
-        self.activityIndicator.hidden = true
-        self.activityIndicator.stopAnimating()
-        self.messageTextView.text = errorString
-    }
-
-    func notify(message:String) {
-        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
-        self.presentViewController(alertController, animated: true, completion: nil)
-    }
-
-
-
     // MARK: - Text field delegate
 
     func textFieldDidBeginEditing(textField: UITextField) {
@@ -162,7 +145,21 @@ class PasswordResetViewController: UIViewController, UITextFieldDelegate {
         }
         return true
     }
-    
-    
+
+
+    // MARK: - Utilities
+
+    func displayMessage(errorString: String) {
+        self.activityIndicator.hidden = true
+        self.activityIndicator.stopAnimating()
+        self.messageTextView.text = errorString
+    }
+
+    func notify(message:String) {
+        let alertController: UIAlertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil) )
+        self.presentViewController(alertController, animated: true, completion: nil)
+    }
+
 }
 

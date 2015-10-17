@@ -8,7 +8,6 @@
 
 import UIKit
 import Foundation
-import Parse
 import CoreData
 
 
@@ -18,12 +17,11 @@ class LoadingViewController: UIViewController {
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
+    // MARK: - Lifecycle Methods
+
     override func viewDidLoad() {
         super.viewDidLoad()
         activityIndicator.startAnimating()
-        
-        // example of observer for NETWORK_STATUS_NOTIFICATION
-        // NSNotificationCenter.defaultCenter().addObserver(self, selector: "connectivityChanged", name: NETWORK_STATUS_NOTIFICATION, object: nil)
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -35,7 +33,7 @@ class LoadingViewController: UIViewController {
             }
         } else {
             self.activityIndicator.stopAnimating()
-            self.proceedToLogin()
+            self.proceedToWelcome()
         }
     }
 
@@ -43,18 +41,9 @@ class LoadingViewController: UIViewController {
         performSegueWithIdentifier("showNavigationView", sender: self)
     }
 
-    func proceedToLogin() {
+    func proceedToWelcome() {
         performSegueWithIdentifier("showWelcome", sender: self)
     }
-
-    
-//    func connectivityChanged() {
-//        println("LoadingViewController.connectivityChanged to \(connectivityStatus)")
-//    }
-//    
-//    deinit {
-//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NETWORK_STATUS_NOTIFICATION, object: nil)
-//    }
 
 }
 
