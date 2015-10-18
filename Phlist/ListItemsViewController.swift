@@ -212,10 +212,11 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         setFontName("OpenSans", forView: cell.nameButton, andSubViews: false)
         cell.listItem = listItem
         if let photo = listItem.photoImage {
-            cell.thumbnailButton.setBackgroundImage(photo, forState: .Normal)
+            cell.thumbnailButton.setImage(photo, forState: .Normal)
         } else {
-            cell.thumbnailButton.setBackgroundImage(UIImage(named: PLACEHOLDER_IMAGE_NAME), forState: .Normal)
+            cell.thumbnailButton.setImage(UIImage(named: PLACEHOLDER_IMAGE_NAME), forState: .Normal)
         }
+        cell.thumbnailButton.imageView!.contentMode = .ScaleAspectFill
         cell.delegate = self
     }
 

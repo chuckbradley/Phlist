@@ -179,7 +179,7 @@ class ModelController {
 
 
 
-    // MARK: - General Object
+    // MARK: - General cloud object
 
     
     // remove user's email from corresponding cloud object's editors array
@@ -601,7 +601,6 @@ class ModelController {
                     self.save()
                 } else if invitationsAvailable { // if user hasn't yet accepted and invitations haven't already been defined
                     if !cloudListIDs.contains(cloudList.objectId!) { // prevent duplicates
-//                    if !invitations.contains(cloudList) { // prevent duplication
                         invitations.append(cloudList)
                     }
                 }
@@ -705,12 +704,6 @@ class ModelController {
                 self.addUserAsEditorToCloudObject(cloudList, handler: nil)
             }
             self.invitations = []
-//            for _ in self.invitations {
-//                let cloudList:PFObject = self.invitations.removeFirst()
-//                _ = List(cloudListObject: cloudList, context: self.context)
-//                self.save()
-//                self.addUserAsEditorToCloudObject(cloudList, handler: nil)
-//            }
             confirmationHandler(confirmed: true)
         }
         alertController.addAction(joinAction)
@@ -751,7 +744,6 @@ class ModelController {
     }
 
 
-
     // confirm user's removal of list
     func confirmRemovalOfList(list: List, fromController controller: UIViewController, confirmationHandler: (confirmed:Bool) -> Void) {
         let title = "Confirm Deletion"
@@ -776,9 +768,6 @@ class ModelController {
         controller.presentViewController(alertController, animated: true, completion: nil)
         
     }
-    
-
-
 
 
 
@@ -793,28 +782,6 @@ class ModelController {
 
         // create PFObject
         createCloudItemFromListItem(item, andItemIsNew: true)
-
-//        let cloudItem = PFObject(className: "ListItem")
-//        cloudItem["name"] = name
-//        cloudItem["deleted"] = false
-//        cloudItem["editors"] = [self.user!.email]
-//        cloudItem["active"] = item.active
-//        cloudItem["hasPhoto"] = item.hasPhoto
-//        cloudItem["photoFilename"] = item.photoFilename
-//        
-//        // associate cloud item with parent cloud list
-//        if let cloudList = list.cloudObject {
-//            cloudItem["list"] = cloudList
-//            saveNewCloudItem(cloudItem, forItem: item, andItemIsNew: true)
-//        } else {
-//            assignCloudObjectToList(list) {
-//                cloudList, error in
-//                if cloudList != nil {
-//                    cloudItem["list"] = cloudList
-//                    self.saveNewCloudItem(cloudItem, forItem: item, andItemIsNew: true)
-//                }
-//            }
-//        }
     }
 
 
@@ -883,16 +850,6 @@ class ModelController {
                 }
             }
         }
-//        cloudItem.saveInBackgroundWithBlock {
-//            success, error in
-//            if success {
-//                item.cloudID = cloudItem.objectId!
-//                item.cloudObject = cloudItem
-//                item.updateSynchronizationDate()
-//                item.cloudObject = cloudItem
-//                self.save()
-//            }
-//        }
     }
 
     
@@ -1241,31 +1198,5 @@ class ModelController {
         }
     }
 
-    
-    
-//    class var lastListsUpdate: NSDate? {
-//        get {
-//            let defaults = NSUserDefaults.standardUserDefaults()
-//            if let update = defaults.objectForKey("lastListsUpdate") as? NSDate {
-//                return update
-//            } else {
-//                return nil
-//            }
-//        }
-//        set {
-//            let defaults = NSUserDefaults.standardUserDefaults()
-//            defaults.setObject(newValue, forKey: "lastListsUpdate")
-//        }
-//    }
 
-
-
-    
-    
-    
-    
-    
-
-
-    
 }
