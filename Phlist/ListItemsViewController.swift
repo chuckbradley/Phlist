@@ -173,12 +173,14 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-        print("willSelectRowAtIndexPath")
+//        print("willSelectRowAtIndexPath")
         return indexPath
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        print("didSelectRowAtIndexPath")
+//        print("didSelectRowAtIndexPath")
+        let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+        self.listItemCellNameTapped(listItem)
     }
 
 

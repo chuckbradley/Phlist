@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "Phlist.ModelController.userIsValid (Phlist.ModelController)() -&gt; Swift.Bool:ModelController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "(Phlist.User)user">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Phlist.ModelController.user.getter : Swift.Optional&lt;Phlist.User&gt;:ModelController.swift">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
