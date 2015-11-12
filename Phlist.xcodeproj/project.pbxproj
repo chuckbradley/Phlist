@@ -34,20 +34,20 @@
 		B81EC7E61B52F43800D04A0A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DB1B52F43800D04A0A /* QuartzCore.framework */; };
 		B81EC7E71B52F43800D04A0A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DC1B52F43800D04A0A /* Security.framework */; };
 		B81EC7E91B52F43800D04A0A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DE1B52F43800D04A0A /* SystemConfiguration.framework */; };
-		B82E59911BBC42500013B50B /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82E59901BBC42500013B50B /* Shared.swift */; settings = {ASSET_TAGS = (); }; };
+		B82E59911BBC42500013B50B /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82E59901BBC42500013B50B /* Shared.swift */; };
 		B862795E1B754C08008022B7 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B862795D1B754C08008022B7 /* Reachability.m */; };
 		B86279601B765EE1008022B7 /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B862795F1B765EE1008022B7 /* Connectivity.swift */; };
 		B8660ECC1B76BF4A00404010 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8660ECB1B76BF4A00404010 /* LoadingViewController.swift */; };
 		B8660ECE1B7C2AD500404010 /* ListItemsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8660ECD1B7C2AD500404010 /* ListItemsViewController.swift */; };
-		B88075A71BBC7137002834F0 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88075A61BBC7137002834F0 /* SignupViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		B88075A91BBC7FE9002834F0 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88075A81BBC7FE9002834F0 /* WelcomeViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		B88E23671BBB96EC00D7F124 /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B88E23641BBB96EC00D7F124 /* OpenSans-Light.ttf */; settings = {ASSET_TAGS = (); }; };
-		B88E23681BBB96EC00D7F124 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B88E23651BBB96EC00D7F124 /* OpenSans-Regular.ttf */; settings = {ASSET_TAGS = (); }; };
-		B88E23691BBB96EC00D7F124 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B88E23661BBB96EC00D7F124 /* OpenSans-Semibold.ttf */; settings = {ASSET_TAGS = (); }; };
+		B88075A71BBC7137002834F0 /* SignupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88075A61BBC7137002834F0 /* SignupViewController.swift */; };
+		B88075A91BBC7FE9002834F0 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88075A81BBC7FE9002834F0 /* WelcomeViewController.swift */; };
+		B88E23671BBB96EC00D7F124 /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B88E23641BBB96EC00D7F124 /* OpenSans-Light.ttf */; };
+		B88E23681BBB96EC00D7F124 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B88E23651BBB96EC00D7F124 /* OpenSans-Regular.ttf */; };
+		B88E23691BBB96EC00D7F124 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B88E23661BBB96EC00D7F124 /* OpenSans-Semibold.ttf */; };
 		B89993CF1B81274A006FDD82 /* ListDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89993CE1B81274A006FDD82 /* ListDetailViewController.swift */; };
 		B89993D11B817A1A006FDD82 /* ActiveListItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89993D01B817A1A006FDD82 /* ActiveListItemCell.swift */; };
 		B89993D31B8AA7C0006FDD82 /* ListItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89993D21B8AA7C0006FDD82 /* ListItemCell.swift */; };
-		B8A3FD941BBF265100A161E8 /* PasswordResetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A3FD931BBF265100A161E8 /* PasswordResetViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		B8A3FD941BBF265100A161E8 /* PasswordResetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A3FD931BBF265100A161E8 /* PasswordResetViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -169,8 +169,8 @@
 			isa = PBXGroup;
 			children = (
 				B8660ECB1B76BF4A00404010 /* LoadingViewController.swift */,
-				B8A3FD951BBF371100A161E8 /* Pre Login */,
-				B8A3FD961BBF375500A161E8 /* Post Login */,
+				B8A3FD951BBF371100A161E8 /* Intro Interface */,
+				B8A3FD961BBF375500A161E8 /* Main Interface */,
 				B81EC7B11B52EBB400D04A0A /* Main.storyboard */,
 				B81EC7B61B52EBB400D04A0A /* LaunchScreen.xib */,
 				B81EC7B41B52EBB400D04A0A /* Images.xcassets */,
@@ -257,7 +257,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		B8A3FD951BBF371100A161E8 /* Pre Login */ = {
+		B8A3FD951BBF371100A161E8 /* Intro Interface */ = {
 			isa = PBXGroup;
 			children = (
 				B88075A81BBC7FE9002834F0 /* WelcomeViewController.swift */,
@@ -265,10 +265,10 @@
 				B8176F631B654F7800DB8556 /* LoginViewController.swift */,
 				B8A3FD931BBF265100A161E8 /* PasswordResetViewController.swift */,
 			);
-			name = "Pre Login";
+			name = "Intro Interface";
 			sourceTree = "<group>";
 		};
-		B8A3FD961BBF375500A161E8 /* Post Login */ = {
+		B8A3FD961BBF375500A161E8 /* Main Interface */ = {
 			isa = PBXGroup;
 			children = (
 				B81EC7AD1B52EBB400D04A0A /* AllListsViewController.swift */,
@@ -278,7 +278,7 @@
 				B89993D01B817A1A006FDD82 /* ActiveListItemCell.swift */,
 				B81EC7AF1B52EBB400D04A0A /* DetailViewController.swift */,
 			);
-			name = "Post Login";
+			name = "Main Interface";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
