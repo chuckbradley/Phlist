@@ -1,6 +1,6 @@
-# Phlist
+Phlist
 
-**Phlist** (from *PHoto LIST*) is an app that allows users to create and maintain 
+Phlist (from "PHoto LIST") is an app that allows users to create and maintain 
 collaborative lists of items with optional photo images - a grocery list in 
 which the wife can enter items and add photos to insure her husband purchases 
 the correct products, for example.
@@ -50,21 +50,21 @@ saved at a suitable resolution and compression so as to not occupy unnecessary
 drive space.
 
 
-####Notes:
+Notes:
 
-* I encourage testers to create multiple accounts to experience the sharing 
+I encourage testers to create multiple accounts to experience the sharing 
 feature.
 
-* Virtually all tasks include immediately saving edits locally and in the cloud. 
+Virtually all tasks include immediately saving edits locally and in the cloud. 
 Since multiple editors might be making changes, each new presentation (e.g. 
 navigating into our out of a list) includes a synchronization request. 
 
-* In most cases, a lack of network connectivity will result in a silent failure, 
+In most cases, a lack of network connectivity will result in a silent failure, 
 allowing for later synchronization. The connectivity state is observed so most 
 cloud requests are conditional on an active connection to avoid delaying the 
 user experience.
 
-* Using the Parse SDK, the cloud data and methods are integrated into the model 
+Using the Parse SDK, the cloud data and methods are integrated into the model 
 to best insure synchronization. While the managed data classes include a 
 reference to their corresponding cloud objects, all other references to the 
 cloud data objects and architecture are contained within a single 
