@@ -25,7 +25,10 @@ class LoadingViewController: UIViewController {
     }
 
     override func viewDidAppear(animated: Bool) {
-        if model.userIsValid() {
+        if model.isClouded != nil && model.isClouded! == false {
+            self.activityIndicator.stopAnimating()
+            self.proceedToApp()
+        } else if model.userIsValid() {
             model.syncLists {
                 success, error in
                 self.activityIndicator.stopAnimating()

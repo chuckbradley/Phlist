@@ -42,6 +42,21 @@ class ModelController {
         CoreDataStackManager.sharedInstance().saveContext()
     }
 
+    var isClouded:Bool? {
+        get {
+            let defaults = NSUserDefaults.standardUserDefaults()
+            if let clouded = defaults.objectForKey("clouded") as? Bool {
+                return clouded
+            } else {
+                return nil
+            }
+        }
+        set {
+            let defaults = NSUserDefaults.standardUserDefaults()
+            defaults.setObject(newValue, forKey: "clouded")
+        }
+    }
+
 
 
     
