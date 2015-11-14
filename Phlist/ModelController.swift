@@ -45,15 +45,16 @@ class ModelController {
     var isClouded:Bool? {
         get {
             let defaults = NSUserDefaults.standardUserDefaults()
-            if let clouded = defaults.objectForKey("clouded") as? Bool {
-                return clouded
+            if defaults.boolForKey("cloudedSet") {
+                return defaults.boolForKey("clouded")
             } else {
                 return nil
             }
         }
         set {
             let defaults = NSUserDefaults.standardUserDefaults()
-            defaults.setObject(newValue, forKey: "clouded")
+            defaults.setBool(newValue!, forKey: "clouded")
+            defaults.setBool(true, forKey: "cloudedSet")
         }
     }
 
@@ -76,7 +77,7 @@ class ModelController {
         }
         
     }
-    
+
 
     func userIsValid() -> Bool {
         // if there is a saved user:
