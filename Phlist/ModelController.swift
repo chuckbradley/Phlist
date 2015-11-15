@@ -1101,15 +1101,17 @@ class ModelController {
         item.searchText = name.lowercaseString
         item.updateModificationDate()
         save()
-        if let cloudItem = item.cloudObject {
-            self.applyDataOfItem(item, toCloudItem: cloudItem)
-        } else {
-            loadCloudItemForListItem(item) {
-                cloudItem, error in
-                if cloudItem != nil {
-                    self.applyDataOfItem(item, toCloudItem: cloudItem!)
-                } else if error == nil {
-                    self.createCloudItemFromListItem(item, andItemIsNew: false)
+        if isClouded {
+            if let cloudItem = item.cloudObject {
+                self.applyDataOfItem(item, toCloudItem: cloudItem)
+            } else {
+                loadCloudItemForListItem(item) {
+                    cloudItem, error in
+                    if cloudItem != nil {
+                        self.applyDataOfItem(item, toCloudItem: cloudItem!)
+                    } else if error == nil {
+                        self.createCloudItemFromListItem(item, andItemIsNew: false)
+                    }
                 }
             }
         }
@@ -1128,15 +1130,17 @@ class ModelController {
         item.hasPhoto = true
         save()
         item.photoImage = image
-        if let cloudItem = item.cloudObject {
-            self.applyDataOfItem(item, toCloudItem: cloudItem)
-        } else {
-            loadCloudItemForListItem(item) {
-                cloudItem, error in
-                if cloudItem != nil {
-                    self.applyDataOfItem(item, toCloudItem: cloudItem!)
-                } else if error == nil {
-                    self.createCloudItemFromListItem(item, andItemIsNew: false)
+        if isClouded {
+            if let cloudItem = item.cloudObject {
+                self.applyDataOfItem(item, toCloudItem: cloudItem)
+            } else {
+                loadCloudItemForListItem(item) {
+                    cloudItem, error in
+                    if cloudItem != nil {
+                        self.applyDataOfItem(item, toCloudItem: cloudItem!)
+                    } else if error == nil {
+                        self.createCloudItemFromListItem(item, andItemIsNew: false)
+                    }
                 }
             }
         }
