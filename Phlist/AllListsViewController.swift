@@ -255,6 +255,9 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         let list = self.fetchedResultsController.objectAtIndexPath(indexPath) as! List
         cell.textLabel!.text = list.title
+        if !model.isClouded { // hide the detail button if not clouded
+            cell.accessoryType = .DisclosureIndicator
+        }
         setFontName("OpenSans", forView: cell.textLabel!, andSubViews: false)
     }
 
