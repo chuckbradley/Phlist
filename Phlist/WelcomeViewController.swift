@@ -21,6 +21,7 @@ class WelcomeViewController: UIViewController {
 
     @IBAction func tapSkipSignupButton(sender: AnyObject) {
         model.isClouded = false
+        model.verifyLocalUser()
         let controller = self.storyboard!.instantiateViewControllerWithIdentifier("NavigationController") as! UINavigationController
         self.presentViewController(controller, animated: true, completion: nil)
     }

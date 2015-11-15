@@ -46,20 +46,24 @@ class ModelController {
     // setting for app saving to cloud or not
     private var _clouded:Bool?
 
-    var isClouded:Bool? {
+    var isClouded:Bool {
         get {
             if _clouded == nil {
                 let defaults = NSUserDefaults.standardUserDefaults()
                 if defaults.boolForKey("cloudedSet") {
                     _clouded = defaults.boolForKey("clouded")
+                } else {
+                    _clouded = true
+                    defaults.setBool(_clouded!, forKey: "clouded")
+                    defaults.setBool(true, forKey: "cloudedSet")
                 }
             }
-            return _clouded
+            return _clouded!
         }
         set {
             _clouded = newValue
             let defaults = NSUserDefaults.standardUserDefaults()
-            defaults.setBool(newValue!, forKey: "clouded")
+            defaults.setBool(newValue, forKey: "clouded")
             defaults.setBool(true, forKey: "cloudedSet")
         }
     }
@@ -85,7 +89,7 @@ class ModelController {
     }
 
 
-    func userIsValid() -> Bool {
+    func userIsValidCloudUser() -> Bool {
         // if there is a saved user:
         if let user = self.user {
             // check for cached Parse user:
@@ -98,6 +102,19 @@ class ModelController {
             }
         }
         return false
+    }
+
+
+    func verifyLocalUser() {
+        if user != nil {
+            if user!.cloudID == nil {
+                return
+            } else {
+                deleteUser()
+            }
+        }
+        user = User(context: self.context)
+        save()
     }
     
     
@@ -208,7 +225,7 @@ class ModelController {
     // and delete cloud object if no editors remain
     func removeUserAsEditorFromCloudObject(cloudObject: PFObject) {
         var changed = false
-        let email = self.user!.email
+        let email = self.user!.email!
         let isList = cloudObject.parseClassName == "List" ? true : false
         if let editors = cloudObject["editors"] as? [String] {
             var editorList = editors
@@ -282,7 +299,7 @@ class ModelController {
 
     // add user's email to corresponding cloud object's editors array
     func addUserAsEditorToCloudObject(cloudObject: PFObject, handler: ((success: Bool, error: NSError?) -> Void)?) {
-        let email = self.user!.email
+        let email = self.user!.email!
         var changed = false
         
         if let editors = cloudObject["editors"] as? [String] {
@@ -333,41 +350,43 @@ class ModelController {
 
     // create local list and corresponding cloud list with title
     func addListWithTitle(title:String) {
-        // create PFObject
-        let cloudList = PFObject(className: "List")
-        cloudList["title"] = title
-        cloudList["deleted"] = false
-        cloudList["editors"] = [self.user!.email]
-        cloudList["acceptedBy"] = [self.user!.email]
-        
         // create basic List object
         let list = List(title: title, context: context)
         save()
-        
-        // save PFObject
-        if connectivityStatus == NOT_REACHABLE {
-            // wait until later to sync
-            cloudList.saveEventually {
-                (success: Bool, error: NSError?) -> Void in
-                if (success) {
-                    // update List object with cloud data
-                    list.cloudID = cloudList.objectId!
-                    list.creationDate = cloudList.createdAt!
-                    list.updateModificationDate()
-                    list.updateSynchronizationDate()
-                    self.save()
+
+        if isClouded {
+            // create PFObject
+            let cloudList = PFObject(className: "List")
+            cloudList["title"] = title
+            cloudList["deleted"] = false
+            cloudList["editors"] = [self.user!.email!]
+            cloudList["acceptedBy"] = [self.user!.email!]
+            
+            // save PFObject
+            if connectivityStatus == NOT_REACHABLE {
+                // wait until later to sync
+                cloudList.saveEventually {
+                    (success: Bool, error: NSError?) -> Void in
+                    if (success) {
+                        // update List object with cloud data
+                        list.cloudID = cloudList.objectId!
+                        list.creationDate = cloudList.createdAt!
+                        list.updateModificationDate()
+                        list.updateSynchronizationDate()
+                        self.save()
+                    }
                 }
-            }
-        } else {
-            cloudList.saveInBackgroundWithBlock {
-                (success: Bool, error: NSError?) -> Void in
-                if (success) {
-                    // update List object with cloud data
-                    list.cloudID = cloudList.objectId!
-                    list.creationDate = cloudList.createdAt!
-                    list.updateModificationDate()
-                    list.updateSynchronizationDate()
-                    self.save()
+            } else {
+                cloudList.saveInBackgroundWithBlock {
+                    (success: Bool, error: NSError?) -> Void in
+                    if (success) {
+                        // update List object with cloud data
+                        list.cloudID = cloudList.objectId!
+                        list.creationDate = cloudList.createdAt!
+                        list.updateModificationDate()
+                        list.updateSynchronizationDate()
+                        self.save()
+                    }
                 }
             }
         }
@@ -379,7 +398,7 @@ class ModelController {
         let cloudList = PFObject(className: "List")
         cloudList["title"] = list.title
         cloudList["deleted"] = false
-        cloudList["editors"] = [self.user!.email]
+        cloudList["editors"] = [self.user!.email!]
         if list.items.count > 0 {
             // add list items to cloud
             var doSave = false
@@ -409,95 +428,99 @@ class ModelController {
 
     // synchronize local lists with user's cloud lists
     func syncLists(completionHandler: (success: Bool, error: NSError?) -> Void) {
-        if connectivityStatus == NOT_REACHABLE {
-            print("syncLists error: connectivityStatus == NOT_REACHABLE")
-            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
-            completionHandler(success: false, error: error)
-        } else {
-            loadCloudLists {
-                cloudLists, error in
-                var newLists = [PFObject]()
-                var cloudListDict = [String:PFObject]()
-                let storedLists = self.loadStoredLists()
-                if error != nil {
-                    // error - synchronization not possible
-                    completionHandler(success: false, error: error!)
-                } else {
-                    if cloudLists!.isEmpty {
-                        for list in storedLists {
-                            if list.toBeDeleted {
-                                self.context.deleteObject(list)
-                                self.save()
-                            } else {
-                                self.createCloudListFromList(list)
-                            }
-                        }
-                    } else if storedLists.isEmpty {
-                        for cloudList in cloudLists! {
-                            if (cloudList["deleted"] as! Bool) {
-                                self.removeUserAsEditorFromCloudObject(cloudList)
-                            } else {
-                                newLists.append(cloudList)
-                            }
-                        }
-                    } else { // lists exist locally and in cloud
-                        // build a referenceable dictionary with the returned lists
-                        for list in cloudLists! {
-                            cloudListDict[list.objectId!] = list
-                        }
-                        // for all the stored lists...
-                        for list in storedLists {
-                            // if it has a cloudID...
-                            if let cloudID = list.cloudID {
-                                // if there is a cloudList with that id, pull it from the dictionary...
-                                if let cloudList = cloudListDict.removeValueForKey(cloudID) {
-                                    // if it needs to be deleted...
-                                    if list.toBeDeleted {
-                                        // remove this user as an editor and delete local list
-                                        self.removeUserAsEditorFromCloudObject(cloudList)
-                                        self.context.deleteObject(list)
-                                    } else {
-                                        // synchronize list data
-                                        let syncDate = list.synchronizationDate!
-                                        let modDate = list.modificationDate
-                                        let cloudDate = cloudList.updatedAt!
-                                        list.cloudObject = cloudList
-
-                                        if modDate.compare(syncDate) == .OrderedDescending || cloudDate.compare(syncDate) == .OrderedDescending {
-                                            if modDate.compare(cloudDate) == .OrderedDescending { // local is newer
-                                                self.applyDataOfList(list, toCloudList: cloudList)
-                                            } else { // cloud is newer
-                                                self.applyDataOfCloudList(cloudList, toList: list)
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    // list has a cloudID (once synced) but there is not a match in the cloud
-                                    // delete local list or recreate cloud list?
-                                    self.context.deleteObject(list)
-                                }
-                                self.save()
-                            } else {
-                                // if there is no cloudID (list created here and not yet synced)...
+        if isClouded {
+            if connectivityStatus == NOT_REACHABLE {
+                print("syncLists error: connectivityStatus == NOT_REACHABLE")
+                let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
+                completionHandler(success: false, error: error)
+            } else {
+                loadCloudLists {
+                    cloudLists, error in
+                    var newLists = [PFObject]()
+                    var cloudListDict = [String:PFObject]()
+                    let storedLists = self.loadStoredLists()
+                    if error != nil {
+                        // error - synchronization not possible
+                        completionHandler(success: false, error: error!)
+                    } else {
+                        if cloudLists!.isEmpty {
+                            for list in storedLists {
                                 if list.toBeDeleted {
-                                    // if to be deleted, remove it from local context
                                     self.context.deleteObject(list)
                                     self.save()
                                 } else {
-                                    // create a cloudList in the cloud
                                     self.createCloudListFromList(list)
                                 }
                             }
+                        } else if storedLists.isEmpty {
+                            for cloudList in cloudLists! {
+                                if (cloudList["deleted"] as! Bool) {
+                                    self.removeUserAsEditorFromCloudObject(cloudList)
+                                } else {
+                                    newLists.append(cloudList)
+                                }
+                            }
+                        } else { // lists exist locally and in cloud
+                            // build a referenceable dictionary with the returned lists
+                            for list in cloudLists! {
+                                cloudListDict[list.objectId!] = list
+                            }
+                            // for all the stored lists...
+                            for list in storedLists {
+                                // if it has a cloudID...
+                                if let cloudID = list.cloudID {
+                                    // if there is a cloudList with that id, pull it from the dictionary...
+                                    if let cloudList = cloudListDict.removeValueForKey(cloudID) {
+                                        // if it needs to be deleted...
+                                        if list.toBeDeleted {
+                                            // remove this user as an editor and delete local list
+                                            self.removeUserAsEditorFromCloudObject(cloudList)
+                                            self.context.deleteObject(list)
+                                        } else {
+                                            // synchronize list data
+                                            let syncDate = list.synchronizationDate!
+                                            let modDate = list.modificationDate
+                                            let cloudDate = cloudList.updatedAt!
+                                            list.cloudObject = cloudList
+
+                                            if modDate.compare(syncDate) == .OrderedDescending || cloudDate.compare(syncDate) == .OrderedDescending {
+                                                if modDate.compare(cloudDate) == .OrderedDescending { // local is newer
+                                                    self.applyDataOfList(list, toCloudList: cloudList)
+                                                } else { // cloud is newer
+                                                    self.applyDataOfCloudList(cloudList, toList: list)
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // list has a cloudID (once synced) but there is not a match in the cloud
+                                        // delete local list or recreate cloud list?
+                                        self.context.deleteObject(list)
+                                    }
+                                    self.save()
+                                } else {
+                                    // if there is no cloudID (list created here and not yet synced)...
+                                    if list.toBeDeleted {
+                                        // if to be deleted, remove it from local context
+                                        self.context.deleteObject(list)
+                                        self.save()
+                                    } else {
+                                        // create a cloudList in the cloud
+                                        self.createCloudListFromList(list)
+                                    }
+                                }
+                            }
+                            // add all remaining cloud lists to newLists array
+                            for list in cloudListDict.values {
+                                newLists.append(list)
+                            }
                         }
-                        // add all remaining cloud lists to newLists array
-                        for list in cloudListDict.values {
-                            newLists.append(list)
-                        }
+                        self.importNewCloudLists(newLists)
+                        completionHandler(success: true, error: nil)
                     }
-                    self.importNewCloudLists(newLists)
-                    completionHandler(success: true, error: nil)
                 }
             }
+        } else {
+            completionHandler(success: false, error: nil)
         }
     }
     
@@ -510,7 +533,7 @@ class ModelController {
             handler(lists: nil, error: error)
         } else {
             let query = PFQuery(className:"List")
-            query.whereKey("editors", equalTo: user!.email)
+            query.whereKey("editors", equalTo: user!.email!)
             query.findObjectsInBackgroundWithBlock {
                 (objects: [AnyObject]?, error: NSError?) -> Void in
                 if error == nil {
@@ -618,7 +641,7 @@ class ModelController {
         for cloudList in cloudLists {
             if let acceptedBy = cloudList["acceptedBy"] as? [String] {
                 // if already accepted (app is repopulating) no confirmation needed
-                if acceptedBy.contains(self.user!.email) { // if user has already accepted the list
+                if acceptedBy.contains(self.user!.email!) { // if user has already accepted the list
                     _ = List(cloudListObject: cloudList, context: self.context)
                     self.save()
                 } else if invitationsAvailable { // if user hasn't yet accepted and invitations haven't already been defined
@@ -852,7 +875,7 @@ class ModelController {
         let cloudItem = PFObject(className: "ListItem")
         cloudItem["name"] = item.name
         cloudItem["deleted"] = false
-        cloudItem["editors"] = [self.user!.email]
+        cloudItem["editors"] = [self.user!.email!]
         cloudItem["active"] = item.active
         cloudItem["hasPhoto"] = item.hasPhoto
         cloudItem["photoFilename"] = item.photoFilename
@@ -1017,7 +1040,7 @@ class ModelController {
             let query = PFQuery(className:"ListItem")
             query.whereKey("list", equalTo: cloudList)
             if filteredForUser {
-                query.whereKey("editors", equalTo: user!.email)
+                query.whereKey("editors", equalTo: user!.email!)
             }
             query.findObjectsInBackgroundWithBlock {
                 (objects: [AnyObject]?, error: NSError?) -> Void in

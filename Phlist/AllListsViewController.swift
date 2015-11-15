@@ -61,6 +61,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         addNewList()
     }
 
+    // TODO: add condition for cloudless (navigate to welcome screen)
     @IBAction func tapLogoutButton(sender: AnyObject) {
         model.logout(self)
     }
@@ -99,7 +100,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     func refreshList() {
         model.syncLists {
             success, error in
-            if success {
+            if error == nil {
                 self.handleResults()
             } else {
                 self.refreshControl?.endRefreshing()
