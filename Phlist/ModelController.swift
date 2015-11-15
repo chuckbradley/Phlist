@@ -825,8 +825,9 @@ class ModelController {
         let item = ListItem(name: name, list: list, context: context)
         save()
 
-        // create PFObject
-        createCloudItemFromListItem(item, andItemIsNew: true)
+        if isClouded { // create PFObject
+            createCloudItemFromListItem(item, andItemIsNew: true)
+        }
     }
 
 
@@ -900,71 +901,23 @@ class ModelController {
     
     // synchronize local items and cloud items for given list
     func syncItemsInList(list: List, completionHandler: (success: Bool, error: NSError?) -> Void) {
-        var newCloudItems = [PFObject]()
-        var cloudItemDict = [String:PFObject]()
-        let storedItems = loadStoredItemsForList(list)
-        if connectivityStatus == NOT_REACHABLE {
-            print("syncItemsInList error: connectivityStatus == NOT_REACHABLE")
-            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
-            completionHandler(success: false, error: error)
-        } else {
-            loadCloudItemsForList(list) {
-                cloudItems, error in
-                if error != nil {
-                    // error - synchronization not possible
-                    completionHandler(success: false, error: error!)
-                } else {
-                    if cloudItems!.isEmpty {
-                        for item in storedItems {
-                            if item.toBeDeleted {
-                                self.context.deleteObject(item)
-                                self.save()
-                            } else {
-                                self.createCloudItemFromListItem(item, andItemIsNew: false)
-                            }
-                        }
-                    }
-                    else if storedItems.isEmpty {
-                        for cloudItem in cloudItems! {
-                            if cloudItem["deleted"] as! Bool {
-                                self.removeUserAsEditorFromCloudObject(cloudItem)
-                            } else {
-                                newCloudItems.append(cloudItem)
-                            }
-                        }
-                    }
-                    else {
-                        for cloudItem in cloudItems! {
-                            cloudItemDict[cloudItem.objectId!] = cloudItem
-                        }
-                        for item in storedItems {
-                            if item.cloudID != nil { // if item has ever been synced...
-                                if let cloudItem = cloudItemDict.removeValueForKey(item.cloudID!) {
-                                    if (cloudItem["deleted"] as! Bool) || item.toBeDeleted {
-                                        cloudItem["deleted"] = true
-                                        self.removeUserAsEditorFromCloudObject(cloudItem)
-                                        self.context.deleteObject(item)
-                                        self.save()
-                                    } else {
-                                        item.cloudObject = cloudItem
-                                        let syncDate = item.synchronizationDate
-                                        let modDate = item.modificationDate
-                                        let cloudDate = cloudItem.updatedAt!
-                                        
-                                        if modDate.compare(syncDate) == .OrderedDescending || cloudDate.compare(syncDate) == .OrderedDescending {
-                                            // apply item data from newer to older source
-                                            if modDate.compare(cloudDate) == .OrderedDescending { // local is newer
-                                                self.applyDataOfItem(item, toCloudItem: cloudItem)
-                                            } else { // cloud is newer
-                                                self.applyDataOfCloudItem(cloudItem, toItem: item)
-                                            }
-                                        }
-                                    }
-                                } else { // error case: once-synced local object exists but cloud doesn't
-                                    self.context.deleteObject(item)
-                                    self.save()
-                                }
-                            } else { // item has never been synced...
+        if isClouded {
+            var newCloudItems = [PFObject]()
+            var cloudItemDict = [String:PFObject]()
+            let storedItems = loadStoredItemsForList(list)
+            if connectivityStatus == NOT_REACHABLE {
+                print("syncItemsInList error: connectivityStatus == NOT_REACHABLE")
+                let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
+                completionHandler(success: false, error: error)
+            } else {
+                loadCloudItemsForList(list) {
+                    cloudItems, error in
+                    if error != nil {
+                        // error - synchronization not possible
+                        completionHandler(success: false, error: error!)
+                    } else {
+                        if cloudItems!.isEmpty {
+                            for item in storedItems {
                                 if item.toBeDeleted {
                                     self.context.deleteObject(item)
                                     self.save()
@@ -973,28 +926,80 @@ class ModelController {
                                 }
                             }
                         }
-                        for cloudItem in cloudItemDict.values {
-                            if !(cloudItem["deleted"] as! Bool) {
-                                newCloudItems.append(cloudItem)
+                        else if storedItems.isEmpty {
+                            for cloudItem in cloudItems! {
+                                if cloudItem["deleted"] as! Bool {
+                                    self.removeUserAsEditorFromCloudObject(cloudItem)
+                                } else {
+                                    newCloudItems.append(cloudItem)
+                                }
                             }
                         }
-                    }
-                    for cloudItem in newCloudItems {
-                        let item = ListItem(cloudItemObject: cloudItem, list: list, context: self.context)
-                        self.addUserAsEditorToCloudObject(cloudItem) {
-                            success, error in
-                            if error != nil {
-                                print("syncItemsInList: error adding user as editor to new list")
+                        else {
+                            for cloudItem in cloudItems! {
+                                cloudItemDict[cloudItem.objectId!] = cloudItem
+                            }
+                            for item in storedItems {
+                                if item.cloudID != nil { // if item has ever been synced...
+                                    if let cloudItem = cloudItemDict.removeValueForKey(item.cloudID!) {
+                                        if (cloudItem["deleted"] as! Bool) || item.toBeDeleted {
+                                            cloudItem["deleted"] = true
+                                            self.removeUserAsEditorFromCloudObject(cloudItem)
+                                            self.context.deleteObject(item)
+                                            self.save()
+                                        } else {
+                                            item.cloudObject = cloudItem
+                                            let syncDate = item.synchronizationDate
+                                            let modDate = item.modificationDate
+                                            let cloudDate = cloudItem.updatedAt!
+                                            
+                                            if modDate.compare(syncDate) == .OrderedDescending || cloudDate.compare(syncDate) == .OrderedDescending {
+                                                // apply item data from newer to older source
+                                                if modDate.compare(cloudDate) == .OrderedDescending { // local is newer
+                                                    self.applyDataOfItem(item, toCloudItem: cloudItem)
+                                                } else { // cloud is newer
+                                                    self.applyDataOfCloudItem(cloudItem, toItem: item)
+                                                }
+                                            }
+                                        }
+                                    } else { // error case: once-synced local object exists but cloud doesn't
+                                        self.context.deleteObject(item)
+                                        self.save()
+                                    }
+                                } else { // item has never been synced...
+                                    if item.toBeDeleted {
+                                        self.context.deleteObject(item)
+                                        self.save()
+                                    } else {
+                                        self.createCloudItemFromListItem(item, andItemIsNew: false)
+                                    }
+                                }
+                            }
+                            for cloudItem in cloudItemDict.values {
+                                if !(cloudItem["deleted"] as! Bool) {
+                                    newCloudItems.append(cloudItem)
+                                }
                             }
                         }
-                        if item.hasPhoto {
-                            self.downloadPhotoFromCloudItem(cloudItem, toItem: item)
+                        for cloudItem in newCloudItems {
+                            let item = ListItem(cloudItemObject: cloudItem, list: list, context: self.context)
+                            self.addUserAsEditorToCloudObject(cloudItem) {
+                                success, error in
+                                if error != nil {
+                                    print("syncItemsInList: error adding user as editor to new list")
+                                }
+                            }
+                            if item.hasPhoto {
+                                self.downloadPhotoFromCloudItem(cloudItem, toItem: item)
+                            }
                         }
+                        self.save()
+                        completionHandler(success: true, error: nil)
                     }
-                    self.save()
-                    completionHandler(success: true, error: nil)
                 }
             }
+        } else {
+            completionHandler(success: false, error: nil)
         }
     }
 
@@ -1064,27 +1069,30 @@ class ModelController {
 
     // retrieve cloud item for local item
     func loadCloudItemForListItem(item: ListItem, handler: (cloudItem: PFObject?, error: NSError?) -> Void) {
-        if let cloudItem = item.cloudObject {
-            handler(cloudItem: cloudItem, error: nil)
-        } else if connectivityStatus == NOT_REACHABLE {
-            print("loadCloudItemForListItem error: connectivityStatus == NOT_REACHABLE")
-            let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
-            handler(cloudItem: nil, error: error)
-        } else if let id = item.cloudID {
-            let query = PFQuery(className:"ListItem")
-            query.getObjectInBackgroundWithId(id) {
-                cloudItem, error in
-                if cloudItem != nil {
-                    item.cloudObject = cloudItem!
-                    handler(cloudItem: cloudItem!, error: nil)
-                } else {
-                    handler(cloudItem: nil, error: error)
+        if isClouded {
+            if let cloudItem = item.cloudObject {
+                handler(cloudItem: cloudItem, error: nil)
+            } else if connectivityStatus == NOT_REACHABLE {
+                print("loadCloudItemForListItem error: connectivityStatus == NOT_REACHABLE")
+                let error = NSError(domain: APP_DOMAIN, code: 100, userInfo: nil)
+                handler(cloudItem: nil, error: error)
+            } else if let id = item.cloudID {
+                let query = PFQuery(className:"ListItem")
+                query.getObjectInBackgroundWithId(id) {
+                    cloudItem, error in
+                    if cloudItem != nil {
+                        item.cloudObject = cloudItem!
+                        handler(cloudItem: cloudItem!, error: nil)
+                    } else {
+                        handler(cloudItem: nil, error: error)
+                    }
                 }
+            } else {
+                handler(cloudItem: nil, error: nil)
             }
         } else {
             handler(cloudItem: nil, error: nil)
         }
-        
     }
 
 
@@ -1214,32 +1222,38 @@ class ModelController {
 
 
     func removeItem(item:ListItem) {
-        item.toBeDeleted = true
-        item.updateModificationDate()
         item.photoImage = nil
-        if connectivityStatus == NOT_REACHABLE {
-            save()
-            print("item marked toBeDeleted because no connection")
-        } else if let cloudItem = item.cloudObject {
-            cloudItem["deleted"] = true
-            removeUserAsEditorFromCloudObject(cloudItem)
-            context.deleteObject(item)
-            save()
-            print("item deleted")
-        } else {
-            loadCloudItemForListItem(item) {
-                cloudItem, error in
-                if cloudItem != nil {
-                    cloudItem!["deleted"] = true
-                    self.removeUserAsEditorFromCloudObject(cloudItem!)
-                    self.context.deleteObject(item)
-                    self.save()
-                    print("item deleted after loading cloud item")
-                } else {
-                    self.save()
-                    print("item marked toBeDeleted because cloud item didn't load")
+        if isClouded {
+            item.toBeDeleted = true
+            item.updateModificationDate()
+            if connectivityStatus == NOT_REACHABLE {
+                save()
+                print("item marked toBeDeleted because no connection")
+            } else if let cloudItem = item.cloudObject {
+                cloudItem["deleted"] = true
+                removeUserAsEditorFromCloudObject(cloudItem)
+                context.deleteObject(item)
+                save()
+                print("item deleted")
+            } else {
+                loadCloudItemForListItem(item) {
+                    cloudItem, error in
+                    if cloudItem != nil {
+                        cloudItem!["deleted"] = true
+                        self.removeUserAsEditorFromCloudObject(cloudItem!)
+                        self.context.deleteObject(item)
+                        self.save()
+                        print("item deleted after loading cloud item")
+                    } else {
+                        self.save()
+                        print("item marked toBeDeleted because cloud item didn't load")
+                    }
                 }
             }
+        } else {
+            context.deleteObject(item)
+            save()
+            print("cloudless item deleted")
         }
     }
 
