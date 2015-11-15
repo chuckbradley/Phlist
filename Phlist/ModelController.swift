@@ -68,9 +68,16 @@ class ModelController {
         }
     }
 
+    func resetClouded() {
+        _clouded = nil
+        let defaults = NSUserDefaults.standardUserDefaults()
+        defaults.setBool(false, forKey: "clouded")
+        defaults.setBool(false, forKey: "cloudedSet")
+    }
 
 
-    
+
+
     // MARK: - User
     
     private var _user:User?
@@ -164,6 +171,9 @@ class ModelController {
         for list in lists {
             let items = loadStoredItemsForList(list)
             for item in items {
+                if item.hasPhoto {
+                    item.photoImage = nil
+                }
                 context.deleteObject(item)
             }
             context.deleteObject(list)
@@ -173,6 +183,7 @@ class ModelController {
             // after completion of deleteAllImages...
             self.deleteUser()
         }
+        resetClouded()
         // go to login screen
         let controller = viewController.storyboard!.instantiateViewControllerWithIdentifier("Welcome") as! WelcomeViewController
         viewController.presentViewController(controller, animated: true, completion: nil)
@@ -187,6 +198,7 @@ class ModelController {
         PFUser.logInWithUsernameInBackground(email, password: password) {
             (user: PFUser?, error: NSError?) -> Void in
             if user != nil {
+                self.isClouded = true
                 self.user = User(cloudUserObject: user!, context: self.context)
                 self.save()
                 handler(success: true, error: nil)
@@ -205,6 +217,7 @@ class ModelController {
         user.signUpInBackgroundWithBlock {
             (succeeded: Bool, error: NSError?) -> Void in
             if succeeded {
+                self.isClouded = true
                 self.user = User(cloudUserObject: user, context: self.context)
                 self.save()
             }
@@ -761,6 +774,14 @@ class ModelController {
     // remove local list and remove user from corresponding cloud list (or flag list to be deleted)
     func removeList(list: List, handler: (() -> Void)?) {
         guard let cloudID = list.cloudID else {
+            // if cloudless, remove all list items and photos
+            let items = loadStoredItemsForList(list)
+            for item in items {
+                if item.hasPhoto {
+                    item.photoImage = nil
+                }
+                context.deleteObject(item)
+            }
             context.deleteObject(list)
             save()
             if let hdlr = handler { hdlr() }
