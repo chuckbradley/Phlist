@@ -42,16 +42,22 @@ class ModelController {
         CoreDataStackManager.sharedInstance().saveContext()
     }
 
+
+    // setting for app saving to cloud or not
+    private var _clouded:Bool?
+
     var isClouded:Bool? {
         get {
-            let defaults = NSUserDefaults.standardUserDefaults()
-            if defaults.boolForKey("cloudedSet") {
-                return defaults.boolForKey("clouded")
-            } else {
-                return nil
+            if _clouded == nil {
+                let defaults = NSUserDefaults.standardUserDefaults()
+                if defaults.boolForKey("cloudedSet") {
+                    _clouded = defaults.boolForKey("clouded")
+                }
             }
+            return _clouded
         }
         set {
+            _clouded = newValue
             let defaults = NSUserDefaults.standardUserDefaults()
             defaults.setBool(newValue!, forKey: "clouded")
             defaults.setBool(true, forKey: "cloudedSet")

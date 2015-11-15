@@ -10,6 +10,8 @@ import UIKit
 
 class WelcomeViewController: UIViewController {
 
+    let model = ModelController.one
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -17,7 +19,12 @@ class WelcomeViewController: UIViewController {
 
     }
 
-    
-    
+    @IBAction func tapSkipSignupButton(sender: AnyObject) {
+        model.isClouded = false
+        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("NavigationController") as! UINavigationController
+        self.presentViewController(controller, animated: true, completion: nil)
+    }
+
+
 }
 
