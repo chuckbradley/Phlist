@@ -162,7 +162,7 @@
                                 <rect key="frame" x="20" y="450" width="560" height="29"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <state key="normal" title="...or skip signup and don't save or share via cloud">
+                                <state key="normal" title="...or skip signup and go cloudless">
                                     <color key="titleColor" red="1" green="0.50196078430000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <connections>
@@ -483,8 +483,10 @@
                     </refreshControl>
                     <connections>
                         <outlet property="listTable" destination="mLL-gJ-YKr" id="3by-Sm-YOj"/>
+                        <outlet property="logoutButton" destination="MMi-bU-7jz" id="QDb-tS-aiu"/>
                         <segue destination="8Q2-SU-zgc" kind="show" identifier="showListDetail" id="xSH-9b-ao2"/>
                         <segue destination="flU-in-TDH" kind="show" identifier="showList" id="eGX-so-ENN"/>
+                        <segue destination="eWM-D8-XeH" kind="presentation" identifier="showSignupFromAllLists" id="QGJ-KR-LWI"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Cn-md-YlS" sceneMemberID="firstResponder"/>
@@ -1275,5 +1277,6 @@
     <inferredMetricsTieBreakers>
         <segue reference="xSH-9b-ao2"/>
         <segue reference="3ed-cS-rq0"/>
+        <segue reference="QGJ-KR-LWI"/>
     </inferredMetricsTieBreakers>
 </document>

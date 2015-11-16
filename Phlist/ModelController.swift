@@ -412,6 +412,8 @@ class ModelController {
         cloudList["title"] = list.title
         cloudList["deleted"] = false
         cloudList["editors"] = [self.user!.email!]
+        cloudList["acceptedBy"] = [self.user!.email!]
+        list.user = self.user! // in case converting from cloudless
         if list.items.count > 0 {
             // add list items to cloud
             var doSave = false
@@ -431,6 +433,7 @@ class ModelController {
             success, error in
             if success {
                 list.cloudID = cloudList.objectId!
+                list.cloudObject = cloudList
                 list.updateModificationDate()
                 list.updateSynchronizationDate()
                 self.save()

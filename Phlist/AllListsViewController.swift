@@ -17,6 +17,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     var firstAppearance = false
 
     @IBOutlet var listTable: UITableView!
+    @IBOutlet weak var logoutButton: UIBarButtonItem!
 
 
     // MARK: - Lifecycle Methods
@@ -35,6 +36,9 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         self.refreshControl!.addTarget(self, action: "pulledTable:", forControlEvents: UIControlEvents.ValueChanged)
 
         buildListAdditionUI()
+        if !model.isClouded {
+            logoutButton.title = "Sign up"
+        }
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
 
@@ -63,7 +67,11 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
 
     // TODO: add condition for cloudless (navigate to welcome screen)
     @IBAction func tapLogoutButton(sender: AnyObject) {
-        model.logout(self)
+        if model.isClouded {
+            model.logout(self)
+        } else {
+            performSegueWithIdentifier("showSignupFromAllLists", sender: self)
+        }
     }
 
     @IBAction func tapRefreshButton(sender: AnyObject) {
