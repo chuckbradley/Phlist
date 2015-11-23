@@ -178,7 +178,7 @@ class ModelController {
             }
             context.deleteObject(list)
         }
-        
+        // remove any remaining local images:
         ModelController.imageCache.deleteAllImages {
             // after completion of deleteAllImages...
             self.deleteUser()
@@ -986,12 +986,15 @@ class ModelController {
                                                 }
                                             }
                                         }
-                                    } else { // error case: once-synced local object exists but cloud doesn't
+                                    } else { // once-synced local object exists but cloud doesn't
+                                        // remove stored item and its image
+                                        item.photoImage = nil
                                         self.context.deleteObject(item)
                                         self.save()
                                     }
                                 } else { // item has never been synced...
                                     if item.toBeDeleted {
+                                        item.photoImage = nil
                                         self.context.deleteObject(item)
                                         self.save()
                                     } else {
