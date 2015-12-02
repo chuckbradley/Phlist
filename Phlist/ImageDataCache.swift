@@ -101,11 +101,16 @@ class ImageDataCache {
     func deleteAllImages(completionHandler: () -> Void) {
         let fileManager = NSFileManager.defaultManager()
         let documentsDirectoryURL = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-        if let enumerator = fileManager.enumeratorAtURL(documentsDirectoryURL, includingPropertiesForKeys: nil, options: [], errorHandler: nil) {
-            while let file = enumerator.nextObject() as? String {
-                do {
-                    try fileManager.removeItemAtURL(documentsDirectoryURL.URLByAppendingPathComponent(file))
-                } catch _ {
+
+        let enumerator:NSDirectoryEnumerator? = fileManager.enumeratorAtURL(documentsDirectoryURL, includingPropertiesForKeys: nil, options: [], errorHandler: nil)
+
+        while let url = enumerator?.nextObject() as! NSURL? {
+            if let lastComponent = url.lastPathComponent {
+                if lastComponent.hasSuffix(".jpg") {
+                    do {
+                        try fileManager.removeItemAtURL(url)
+                    } catch _ {
+                    }
                 }
             }
         }

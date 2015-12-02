@@ -57,8 +57,8 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
     }
 
     @IBAction func tapCancelButton(sender: AnyObject) {
-        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("Welcome") as! WelcomeViewController
-        self.presentViewController(controller, animated: true, completion: nil)
+        self.view.endEditing(true)
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
 
     func tapAway(recognizer: UITapGestureRecognizer) {
@@ -110,61 +110,6 @@ class SignupViewController: UIViewController, UITextFieldDelegate {
             }
         }
     }
-
-
-//    func attemptSignup() {
-//        self.view.endEditing(true)
-//        activityIndicator.hidden = false
-//        activityIndicator.startAnimating()
-//
-//        let user = PFUser()
-//        user.username = emailField.text!
-//        user.email = emailField.text!
-//        user.password = passwordField.text!
-//
-//        user.signUpInBackgroundWithBlock {
-//            (succeeded: Bool, error: NSError?) -> Void in
-//            self.activityIndicator.hidden = true
-//            self.activityIndicator.stopAnimating()
-//
-//            guard succeeded else {
-//                guard let error = error else {
-//                    print("unsuccessful, but no reported error")
-//                    self.displayError("Error: Signup failed. Try again later.")
-//                    return
-//                }
-//                var errorString = error.userInfo["error"] as! NSString
-//                let errorCode = error.userInfo["code"] as! Int
-//                if errorCode == 100 {
-//                    errorString = "Error: No network connection"
-//                } else if errorCode == 101 {
-//                    errorString = "Can't find that account. Double-check your email and password."
-//                } else if errorCode == 200 {
-//                    errorString = "Oops! You're missing your email."
-//                } else if errorCode == 201 {
-//                    errorString = "Oops! You're missing your password."
-//                } else if errorCode == 202 {
-//                    errorString = "Sorry, that email is already taken."
-//                } else if errorCode == 203 {
-//                    errorString = "Sorry, that email is already taken."
-//                } else if errorCode == 204 {
-//                    errorString = "Oops! You're missing your email"
-//                } else if errorCode == 125 {
-//                    errorString = "Oops! That's not a valid email."
-//                } else {
-//                    errorString = "Error: Signup failed"
-//                }
-//                // Show the errorString somewhere and let the user try again.
-//                print("\nerror code = \(errorCode)")
-//                self.displayError("\(errorString)")
-//                return
-//            }
-//
-//            self.model.user = User(cloudUserObject: user, context: self.model.context)
-//            self.model.save()
-//            self.proceedToApp()
-//        }
-//    }
 
 
     func proceedToApp() {
