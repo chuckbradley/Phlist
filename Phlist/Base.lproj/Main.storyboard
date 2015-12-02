@@ -53,7 +53,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PPe-U0-Hrb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1458" y="-181"/>
+            <point key="canvasLocation" x="-1460" y="-555"/>
         </scene>
         <!--Welcome-->
         <scene sceneID="FAR-6D-0Us">
@@ -137,7 +137,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="top" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="* We won't share your information with anyone - other than your friends with whom you share your lists." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G0y-h0-CJj">
-                                <rect key="frame" x="20" y="546.5" width="560" height="33.5"/>
+                                <rect key="frame" x="20" y="546" width="560" height="34"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -411,7 +411,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eq9-QA-ai8" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-744" y="418"/>
+            <point key="canvasLocation" x="-744" y="42"/>
         </scene>
         <!--All Lists-->
         <scene sceneID="VgW-fR-Quf">
@@ -424,15 +424,15 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" showsReorderControl="YES" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="nIO-Q2-sdY" style="IBUITableViewCellStyleDefault" id="m0d-ak-lc9">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" showsReorderControl="YES" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="nIO-Q2-sdY" style="IBUITableViewCellStyleDefault" id="m0d-ak-lc9">
                                 <rect key="frame" x="0.0" y="22" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="m0d-ak-lc9" id="d3P-M7-ByW">
-                                    <rect key="frame" x="0.0" y="0.0" width="533" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="567" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="nIO-Q2-sdY">
-                                            <rect key="frame" x="15" y="0.0" width="518" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="550" height="43"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -484,14 +484,13 @@
                     <connections>
                         <outlet property="listTable" destination="mLL-gJ-YKr" id="3by-Sm-YOj"/>
                         <outlet property="logoutButton" destination="MMi-bU-7jz" id="QDb-tS-aiu"/>
-                        <segue destination="8Q2-SU-zgc" kind="show" identifier="showListDetail" id="xSH-9b-ao2"/>
                         <segue destination="flU-in-TDH" kind="show" identifier="showList" id="eGX-so-ENN"/>
                         <segue destination="eWM-D8-XeH" kind="presentation" identifier="showSignupFromAllLists" id="QGJ-KR-LWI"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Cn-md-YlS" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-37" y="418"/>
+            <point key="canvasLocation" x="-28" y="42"/>
         </scene>
         <!--ListDetail-->
         <scene sceneID="5kL-1b-yIi">
@@ -563,14 +562,14 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Members" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gch-3h-Qyc">
-                                <rect key="frame" x="20" y="149" width="560" height="20"/>
+                                <rect key="frame" x="20" y="149" width="560" height="21"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nsR-Qe-W7Z">
-                                <rect key="frame" x="20" y="177" width="560" height="132"/>
+                                <rect key="frame" x="20" y="178" width="560" height="132"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" showsSelectionImmediatelyOnTouchBegin="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Hjl-Mt-AAq">
                                         <rect key="frame" x="0.0" y="0.0" width="568" height="132"/>
@@ -612,14 +611,14 @@
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Invitees" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DC4-jX-9qg">
-                                <rect key="frame" x="20" y="329" width="560" height="21"/>
+                                <rect key="frame" x="20" y="330" width="560" height="21"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TRQ-Ol-tpC">
-                                <rect key="frame" x="20" y="358" width="560" height="88"/>
+                                <rect key="frame" x="20" y="359" width="560" height="88"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" showsSelectionImmediatelyOnTouchBegin="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="4s7-dW-aHP">
                                         <rect key="frame" x="0.0" y="0.0" width="568" height="88"/>
@@ -702,7 +701,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cFO-Iz-463" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="679" y="798"/>
+            <point key="canvasLocation" x="1397" y="-680"/>
         </scene>
         <!--Detail-->
         <scene sceneID="Cn3-H9-jdl">
@@ -920,6 +919,7 @@
                     <connections>
                         <outlet property="tableView" destination="cJH-kE-V4B" id="R54-Qp-JMW"/>
                         <segue destination="Ah7-4n-0Wa" kind="show" identifier="showItemDetail" id="dxS-My-a8k"/>
+                        <segue destination="eWM-D8-XeH" kind="presentation" identifier="showSignupFromListItems" id="Vqx-3e-o7R"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="o0R-9h-Jkh" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1275,8 +1275,7 @@
         <image name="strike-1x10" width="10" height="44"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="xSH-9b-ao2"/>
+        <segue reference="Vqx-3e-o7R"/>
         <segue reference="3ed-cS-rq0"/>
-        <segue reference="QGJ-KR-LWI"/>
     </inferredMetricsTieBreakers>
 </document>

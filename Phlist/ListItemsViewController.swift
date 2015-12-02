@@ -103,10 +103,36 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
             guard let item = self.selectedItem else { return }
             destination.listItem = item
         } else if segue.identifier == "showListDetail" {
-            let destination = segue.destinationViewController as! ListDetailViewController
-            destination.list = self.list
+            if self.model.isClouded {
+                let destination = segue.destinationViewController as! ListDetailViewController
+                destination.list = self.list
+            } else {
+                confirmSignupSegue()
+            }
+        } else if segue.identifier == "showSignupFromListItems" {
         }
+    }
 
+
+    func confirmSignupSegue() {
+        let title = "Cloud Account Required"
+        let message = "To share a list, you must be logged in with an account. Do you want to set up an account?"
+
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+
+        let signupAction = UIAlertAction(title: "Sign Up", style: .Default) {
+            action in
+            self.performSegueWithIdentifier("showSignupFromListItems", sender: self)
+        }
+        alertController.addAction(signupAction)
+
+        let cancelAction = UIAlertAction(title: "Cancel", style:  .Cancel) {
+            action in
+            return
+        }
+        alertController.addAction(cancelAction)
+
+        presentViewController(alertController, animated: true, completion: nil)
     }
 
 

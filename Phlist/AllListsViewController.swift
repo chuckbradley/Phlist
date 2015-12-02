@@ -13,7 +13,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
 
     let model = ModelController.one
     
-    var listPointer: List?
     var firstAppearance = false
 
     @IBOutlet var listTable: UITableView!
@@ -95,10 +94,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
             guard let list = self.fetchedResultsController.objectAtIndexPath(indexPath) as? List else { return }
             let controller = segue.destinationViewController as! ListItemsViewController
             controller.list = list
-        }
-        if segue.identifier == "showListDetail" {
-            let controller = segue.destinationViewController as! ListDetailViewController
-            controller.list = listPointer!
         }
     }
 
@@ -223,11 +218,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         return cell
     }
     
-    override func tableView(tableView: UITableView, accessoryButtonTappedForRowWithIndexPath indexPath: NSIndexPath) {
-        let list = self.fetchedResultsController.objectAtIndexPath(indexPath) as! List
-        listPointer = list
-        performSegueWithIdentifier("showListDetail", sender: self)
-    }
         
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
@@ -238,7 +228,12 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         let list = fetchedResultsController.objectAtIndexPath(indexPath) as! List
 
         if editingStyle == .Delete {
-            model.removeList(list, handler: nil)
+            model.confirmRemovalOfList(list, fromController: self) {
+                confirmed in
+                if confirmed {
+                    self.model.removeList(list, handler: nil)
+                }
+            }
         }
     }
 
@@ -285,7 +280,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         self.view.addSubview(dismissalPanel!)
 
         // create panel
-        listAdditionPanel = UIView(frame: CGRectMake(0, -250, view.bounds.width, 54))
+        listAdditionPanel = UIView(frame: CGRectMake(0, -350, view.bounds.width, 54))
         listAdditionPanel!.backgroundColor=UIColor.orangeColor()
 
         // create text field
@@ -348,7 +343,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         self.newListNameField!.resignFirstResponder()
         UIView.animateWithDuration(0.4,
             animations: {
-                self.listAdditionPanel!.frame.origin.y = -250
+                self.listAdditionPanel!.frame.origin.y = -350
                 self.dismissalPanel!.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.0)
             },
             completion: {
