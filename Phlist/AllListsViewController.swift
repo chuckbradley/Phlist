@@ -13,10 +13,10 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
 
     let model = ModelController.one
     
-    var listPointer: List?
     var firstAppearance = false
 
     @IBOutlet var listTable: UITableView!
+    @IBOutlet weak var logoutButton: UIBarButtonItem!
 
 
     // MARK: - Lifecycle Methods
@@ -35,6 +35,9 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         self.refreshControl!.addTarget(self, action: "pulledTable:", forControlEvents: UIControlEvents.ValueChanged)
 
         buildListAdditionUI()
+        if !model.isClouded {
+            logoutButton.title = "Sign up"
+        }
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
 
@@ -61,8 +64,13 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         addNewList()
     }
 
+    // TODO: add condition for cloudless (navigate to welcome screen)
     @IBAction func tapLogoutButton(sender: AnyObject) {
-        model.logout(self)
+        if model.isClouded {
+            model.logout(self)
+        } else {
+            performSegueWithIdentifier("showSignupFromAllLists", sender: self)
+        }
     }
 
     @IBAction func tapRefreshButton(sender: AnyObject) {
@@ -87,10 +95,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
             let controller = segue.destinationViewController as! ListItemsViewController
             controller.list = list
         }
-        if segue.identifier == "showListDetail" {
-            let controller = segue.destinationViewController as! ListDetailViewController
-            controller.list = listPointer!
-        }
     }
 
 
@@ -99,7 +103,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     func refreshList() {
         model.syncLists {
             success, error in
-            if success {
+            if error == nil {
                 self.handleResults()
             } else {
                 self.refreshControl?.endRefreshing()
@@ -214,11 +218,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         return cell
     }
     
-    override func tableView(tableView: UITableView, accessoryButtonTappedForRowWithIndexPath indexPath: NSIndexPath) {
-        let list = self.fetchedResultsController.objectAtIndexPath(indexPath) as! List
-        listPointer = list
-        performSegueWithIdentifier("showListDetail", sender: self)
-    }
         
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
@@ -229,7 +228,12 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         let list = fetchedResultsController.objectAtIndexPath(indexPath) as! List
 
         if editingStyle == .Delete {
-            model.removeList(list, handler: nil)
+            model.confirmRemovalOfList(list, fromController: self) {
+                confirmed in
+                if confirmed {
+                    self.model.removeList(list, handler: nil)
+                }
+            }
         }
     }
 
@@ -254,6 +258,9 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         let list = self.fetchedResultsController.objectAtIndexPath(indexPath) as! List
         cell.textLabel!.text = list.title
+        if !model.isClouded { // hide the detail button if not clouded
+            cell.accessoryType = .DisclosureIndicator
+        }
         setFontName("OpenSans", forView: cell.textLabel!, andSubViews: false)
     }
 
@@ -273,7 +280,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         self.view.addSubview(dismissalPanel!)
 
         // create panel
-        listAdditionPanel = UIView(frame: CGRectMake(0, -250, view.bounds.width, 54))
+        listAdditionPanel = UIView(frame: CGRectMake(0, -350, view.bounds.width, 54))
         listAdditionPanel!.backgroundColor=UIColor.orangeColor()
 
         // create text field
@@ -336,7 +343,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         self.newListNameField!.resignFirstResponder()
         UIView.animateWithDuration(0.4,
             animations: {
-                self.listAdditionPanel!.frame.origin.y = -250
+                self.listAdditionPanel!.frame.origin.y = -350
                 self.dismissalPanel!.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.0)
             },
             completion: {

@@ -56,8 +56,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
 
     @IBAction func tapCancelButton(sender: AnyObject) {
-        let controller = self.storyboard!.instantiateViewControllerWithIdentifier("Welcome") as! WelcomeViewController
-        self.presentViewController(controller, animated: true, completion: nil)
+        self.view.endEditing(true)
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
 
     func tapAway(recognizer: UITapGestureRecognizer) {
