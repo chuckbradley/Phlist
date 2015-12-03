@@ -16,6 +16,7 @@ class ListItem : NSManagedObject {
     @NSManaged var cloudID: String?
     @NSManaged var name: String
     @NSManaged var searchText: String
+    @NSManaged var position: Int
     @NSManaged var active: Bool
     @NSManaged var toBeDeleted: Bool
     @NSManaged var creationDate: NSDate
@@ -47,6 +48,7 @@ class ListItem : NSManagedObject {
         name = cloudItemObject["name"] as! String
         searchText = self.name.lowercaseString
         active = cloudItemObject["active"] as! Bool
+        position = cloudItemObject["position"] as! Int
         toBeDeleted = false
         creationDate = cloudItemObject.createdAt!
         modificationDate = NSDate()
@@ -64,6 +66,7 @@ class ListItem : NSManagedObject {
         self.list = list
         searchText = name.lowercaseString
         active = true
+        position = list.items.count
         toBeDeleted = false
         creationDate = NSDate()
         modificationDate = NSDate()

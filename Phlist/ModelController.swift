@@ -904,6 +904,7 @@ class ModelController {
         cloudItem["active"] = item.active
         cloudItem["hasPhoto"] = item.hasPhoto
         cloudItem["photoFilename"] = item.photoFilename
+        cloudItem["position"] = item.position
         if item.hasPhoto && item.photoImageData != nil {
             cloudItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
         }

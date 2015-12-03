@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="8195" systemVersion="14F27" minimumToolsVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="15B42" minimumToolsVersion="Automatic">
     <entity name="List" representedClassName="List" syncable="YES">
         <attribute name="cloudID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
@@ -16,11 +16,12 @@
         <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="hasPhoto" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="modificationDate" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="name" attributeType="String" syncable="YES"/>
+        <attribute name="name" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="photoDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="photoFilename" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="photoSynchronizationDate" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="searchText" attributeType="String" syncable="YES"/>
+        <attribute name="position" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="searchText" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="synchronizationDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="toBeDeleted" optional="YES" attributeType="Boolean" syncable="YES"/>
         <relationship name="list" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="List" inverseName="items" inverseEntity="List" syncable="YES"/>
@@ -32,7 +33,7 @@
     </entity>
     <elements>
         <element name="List" positionX="261" positionY="216" width="128" height="165"/>
-        <element name="ListItem" positionX="439" positionY="216" width="128" height="240"/>
+        <element name="ListItem" positionX="439" positionY="216" width="128" height="255"/>
         <element name="User" positionX="468" positionY="180" width="128" height="90"/>
     </elements>
 </model>
