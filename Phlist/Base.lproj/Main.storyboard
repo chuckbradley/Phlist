@@ -424,7 +424,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" showsReorderControl="YES" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="nIO-Q2-sdY" style="IBUITableViewCellStyleDefault" id="m0d-ak-lc9">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="nIO-Q2-sdY" style="IBUITableViewCellStyleDefault" id="m0d-ak-lc9">
                                 <rect key="frame" x="0.0" y="22" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="m0d-ak-lc9" id="d3P-M7-ByW">
@@ -453,10 +453,10 @@
                         </connections>
                     </tableView>
                     <toolbarItems>
-                        <barButtonItem title="Log out" id="MMi-bU-7jz">
+                        <barButtonItem title="Edit" id="MMi-bU-7jz">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
-                                <action selector="tapLogoutButton:" destination="pGg-6v-bdr" id="N2K-Zz-89c"/>
+                                <action selector="tapEditButton:" destination="pGg-6v-bdr" id="3a7-8B-HrI"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="SLL-Zv-ni7"/>
@@ -467,7 +467,14 @@
                             </connections>
                         </barButtonItem>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="All Lists" id="tQt-TN-PWz"/>
+                    <navigationItem key="navigationItem" title="All Lists" id="tQt-TN-PWz">
+                        <barButtonItem key="leftBarButtonItem" title="Log out" id="crs-Kt-xx7">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <action selector="tapLogoutButton:" destination="pGg-6v-bdr" id="Dmp-UK-ahr"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics" barStyle="black" translucent="NO"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="fsq-86-61R">
                         <autoresizingMask key="autoresizingMask"/>
@@ -482,8 +489,9 @@
                         </attributedString>
                     </refreshControl>
                     <connections>
+                        <outlet property="editButton" destination="MMi-bU-7jz" id="knm-mU-41Y"/>
                         <outlet property="listTable" destination="mLL-gJ-YKr" id="3by-Sm-YOj"/>
-                        <outlet property="logoutButton" destination="MMi-bU-7jz" id="QDb-tS-aiu"/>
+                        <outlet property="logoutButton" destination="crs-Kt-xx7" id="SSu-ZG-sdm"/>
                         <segue destination="flU-in-TDH" kind="show" identifier="showList" id="eGX-so-ENN"/>
                         <segue destination="eWM-D8-XeH" kind="presentation" identifier="showSignupFromAllLists" id="QGJ-KR-LWI"/>
                     </connections>
@@ -1275,7 +1283,7 @@
         <image name="strike-1x10" width="10" height="44"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Vqx-3e-o7R"/>
         <segue reference="3ed-cS-rq0"/>
+        <segue reference="Vqx-3e-o7R"/>
     </inferredMetricsTieBreakers>
 </document>
