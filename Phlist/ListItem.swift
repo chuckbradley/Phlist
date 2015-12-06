@@ -48,7 +48,11 @@ class ListItem : NSManagedObject {
         name = cloudItemObject["name"] as! String
         searchText = self.name.lowercaseString
         active = cloudItemObject["active"] as! Bool
-        position = cloudItemObject["position"] as! Int
+        if let listPosition = cloudItemObject["position"] as? Int {
+            position = listPosition
+        } else {
+            position = list.items.count - 1
+        }
         toBeDeleted = false
         creationDate = cloudItemObject.createdAt!
         modificationDate = NSDate()

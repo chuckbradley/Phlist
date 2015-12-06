@@ -805,7 +805,7 @@
                                 <animations/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell contentMode="TopLeft" restorationIdentifier="ActiveCell" selectionStyle="default" showsReorderControl="YES" indentationWidth="10" reuseIdentifier="ActiveCell" editingAccessoryType="disclosureIndicator" rowHeight="60" id="DXg-Lo-Itx" customClass="ActiveListItemCell" customModule="Phlist" customModuleProvider="target">
+                                    <tableViewCell contentMode="TopLeft" restorationIdentifier="ActiveCell" selectionStyle="default" showsReorderControl="YES" indentationWidth="10" reuseIdentifier="ActiveCell" rowHeight="60" id="DXg-Lo-Itx" customClass="ActiveListItemCell" customModule="Phlist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="22" width="600" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DXg-Lo-Itx" id="tkp-PQ-LRB">
@@ -856,7 +856,7 @@
                                             <outlet property="thumbnailButton" destination="Z9j-6d-IdM" id="4R7-3l-eyp"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" restorationIdentifier="ArchiveCell" selectionStyle="none" indentationWidth="10" reuseIdentifier="ArchiveCell" id="M1J-BX-VRs" customClass="ListItemCell" customModule="Phlist" customModuleProvider="target">
+                                    <tableViewCell contentMode="scaleToFill" restorationIdentifier="ArchiveCell" selectionStyle="none" showsReorderControl="YES" indentationWidth="10" reuseIdentifier="ArchiveCell" id="M1J-BX-VRs" customClass="ListItemCell" customModule="Phlist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="82" width="600" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="M1J-BX-VRs" id="dGO-a2-19R">
@@ -910,13 +910,19 @@
                         </constraints>
                     </view>
                     <toolbarItems>
+                        <barButtonItem title="Edit" id="7br-As-FUF">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <action selector="tapEditButton:" destination="flU-in-TDH" id="qY4-S2-rPw"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="5a0-4R-VZV"/>
                         <barButtonItem title="Remove List" id="yzB-4X-P5v">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="tapRemoveListButton:" destination="flU-in-TDH" id="ClZ-In-bjq"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="9a1-Uk-csB"/>
                         <barButtonItem title="Sharing" id="dIA-4F-Yg0">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
@@ -925,6 +931,9 @@
                         </barButtonItem>
                     </toolbarItems>
                     <connections>
+                        <outlet property="editButton" destination="7br-As-FUF" id="J57-kO-OeF"/>
+                        <outlet property="removeListButton" destination="yzB-4X-P5v" id="jb6-Xo-4TX"/>
+                        <outlet property="sharingButton" destination="dIA-4F-Yg0" id="SKn-VY-G7D"/>
                         <outlet property="tableView" destination="cJH-kE-V4B" id="R54-Qp-JMW"/>
                         <segue destination="Ah7-4n-0Wa" kind="show" identifier="showItemDetail" id="dxS-My-a8k"/>
                         <segue destination="eWM-D8-XeH" kind="presentation" identifier="showSignupFromListItems" id="Vqx-3e-o7R"/>

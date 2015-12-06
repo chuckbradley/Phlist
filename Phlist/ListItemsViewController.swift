@@ -20,6 +20,9 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     let PLACEHOLDER_IMAGE_NAME = "phlist-placeholder"
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var editButton: UIBarButtonItem!
+    @IBOutlet weak var removeListButton: UIBarButtonItem!
+    @IBOutlet weak var sharingButton: UIBarButtonItem!
 
     var refreshControl:UIRefreshControl!
 
@@ -33,6 +36,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         self.navigationItem.rightBarButtonItem = addButton
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        removeListButton.title = ""
 
         self.title = list.title
 
@@ -67,8 +71,24 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     // MARK: - Actions
 
+    @IBAction func tapEditButton(sender: UIBarButtonItem) {
+        self.tableView.setEditing(!self.tableView.editing, animated: true)
+        if self.tableView.editing {
+            editButton.title = "Done"
+            sharingButton.title = ""
+            removeListButton.title = "Remove List"
+        } else {
+            editButton.title = "Edit"
+            removeListButton.title = ""
+            sharingButton.title = "Sharing"
+            // TODO: save changes
+        }
+    }
+
     @IBAction func tapRemoveListButton(sender: AnyObject) {
-        removeList()
+        if self.editing {
+            removeList()
+        }
     }
 
     func removeList() {
@@ -180,6 +200,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
 
+    // row configuration:
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         if listItem.active {
@@ -193,31 +214,6 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }
     }
 
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-
-    func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-//        print("willSelectRowAtIndexPath")
-        return indexPath
-    }
-
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-//        print("didSelectRowAtIndexPath")
-        let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
-        self.listItemCellNameTapped(listItem)
-    }
-
-
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            print("tableView:commitEditingStyle:forRowAtIndexPath[\(indexPath.row)]")
-            let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
-            model.removeItem(item)
-        }
-    }
-    
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         if listItem.active { return 60.0 }
@@ -246,6 +242,61 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         }
         cell.thumbnailButton.imageView!.contentMode = .ScaleAspectFill
         cell.delegate = self
+    }
+
+    // row selection:
+    func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+        return indexPath
+    }
+
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+        self.listItemCellNameTapped(listItem)
+    }
+
+
+    // row movement
+    func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+
+    func tableView(tableView: UITableView, targetIndexPathForMoveFromRowAtIndexPath sourceIndexPath: NSIndexPath, toProposedIndexPath proposedDestinationIndexPath: NSIndexPath) -> NSIndexPath {
+        if sourceIndexPath.section != proposedDestinationIndexPath.section {
+            var row = 0
+            if sourceIndexPath.section < proposedDestinationIndexPath.section {
+                row = self.tableView(tableView, numberOfRowsInSection: sourceIndexPath.section) - 1
+            }
+            return NSIndexPath(forRow: row, inSection: sourceIndexPath.section)
+        }
+        return proposedDestinationIndexPath
+    }
+
+    func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+        if var items = fetchedResultsController.fetchedObjects as? [ListItem] {
+            let itemToMove = fetchedResultsController.objectAtIndexPath(fromIndexPath) as! ListItem
+            items.removeAtIndex(fromIndexPath.row)
+            items.insert(itemToMove, atIndex: toIndexPath.row)
+
+            for (index, item) in items.enumerate() {
+                let newPosition = items.count - index - 1
+//                print("Item \(item.name), pos: from \(item.position) to \(newPosition)")
+                item.position = newPosition
+            }
+        }
+    }
+
+
+    // row editing
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            print("tableView:commitEditingStyle:forRowAtIndexPath[\(indexPath.row)]")
+            let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
+            model.removeItem(item)
+        }
     }
 
     // MARK: - Table Cell Delegate Actions
@@ -288,10 +339,11 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         
         let fetchRequest = NSFetchRequest(entityName: "ListItem")
         
-        // define sorting: first by active (for sectioning) then by creation date (within each section)
+        // define sorting: first by active (for sectioning), then by position, then by creation date (within each section)
         let activeDescriptor = NSSortDescriptor(key: "active", ascending: false) // active then archived
+        let positionDescriptor = NSSortDescriptor(key: "position", ascending: false) // by assigned order
         let dateDescriptor = NSSortDescriptor(key: "creationDate", ascending: false) // first in, last out
-        fetchRequest.sortDescriptors = [activeDescriptor, dateDescriptor]
+        fetchRequest.sortDescriptors = [activeDescriptor, positionDescriptor, dateDescriptor]
         
         let parentListPredicate = NSPredicate(format: "list == %@", self.list) // only items in the parent list
         let noDeletedListPredicate = NSPredicate(format: "toBeDeleted == %@", false) // don't include toBeDeleted
