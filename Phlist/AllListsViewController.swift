@@ -75,7 +75,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         if self.editing {
             self.editing = false
             editButton.title = "Edit"
-            // TODO: save changes
         } else {
             self.editing = true
             editButton.title = "Done"
