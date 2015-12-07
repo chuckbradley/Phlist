@@ -32,6 +32,7 @@ class ListItem : NSManagedObject {
     var cloudObject:PFObject?
     let model = ModelController.one
     let cache = ModelController.imageCache
+    var oldPosition:Int?
 
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)

@@ -24,6 +24,8 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     @IBOutlet weak var removeListButton: UIBarButtonItem!
     @IBOutlet weak var sharingButton: UIBarButtonItem!
 
+    var itemsReordered = false
+
     var refreshControl:UIRefreshControl!
 
     // MARK: - Lifecycle Methods
@@ -72,17 +74,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     // MARK: - Actions
 
     @IBAction func tapEditButton(sender: UIBarButtonItem) {
-        self.tableView.setEditing(!self.tableView.editing, animated: true)
-        if self.tableView.editing {
-            editButton.title = "Done"
-            sharingButton.title = ""
-            removeListButton.title = "Remove List"
-        } else {
-            editButton.title = "Edit"
-            removeListButton.title = ""
-            sharingButton.title = "Sharing"
-            // TODO: save changes
-        }
+        toggleTableEditing()
     }
 
     @IBAction func tapRemoveListButton(sender: AnyObject) {
@@ -105,6 +97,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func refreshList() {
+        if tableView.editing { toggleTableEditing() }
         model.syncItemsInList(list) {
             success, error in
             do {
@@ -114,7 +107,32 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
             self.refreshControl.endRefreshing()
         }
     }
-    
+
+    func toggleTableEditing() {
+        self.tableView.setEditing(!self.tableView.editing, animated: true)
+        if self.tableView.editing {
+            itemsReordered = false
+            if let items = fetchedResultsController.fetchedObjects as? [ListItem] {
+                for item in items {
+                    item.oldPosition = item.position
+                }
+            }
+            editButton.title = "Done"
+            sharingButton.title = ""
+            removeListButton.title = "Remove List"
+        } else {
+            editButton.title = "Edit"
+            removeListButton.title = ""
+            sharingButton.title = "Sharing"
+            if itemsReordered {
+                if let items = fetchedResultsController.fetchedObjects as? [ListItem] {
+                    model.applyPositionChangesForItems(items)
+                }
+            }
+            itemsReordered = false
+        }
+    }
+
     // MARK: - Segues
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -200,7 +218,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
 
-    // row configuration:
+    // MARK: row configuration:
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let listItem = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
         if listItem.active {
@@ -244,7 +262,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         cell.delegate = self
     }
 
-    // row selection:
+    // MARK: row selection:
     func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
         return indexPath
     }
@@ -255,7 +273,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
 
-    // row movement
+    // MARK: row movement
     func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return true
     }
@@ -272,28 +290,26 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+        itemsReordered = true
         if var items = fetchedResultsController.fetchedObjects as? [ListItem] {
             let itemToMove = fetchedResultsController.objectAtIndexPath(fromIndexPath) as! ListItem
             items.removeAtIndex(fromIndexPath.row)
             items.insert(itemToMove, atIndex: toIndexPath.row)
-
             for (index, item) in items.enumerate() {
-                let newPosition = items.count - index - 1
-//                print("Item \(item.name), pos: from \(item.position) to \(newPosition)")
-                item.position = newPosition
+                item.position = items.count - index - 1
             }
         }
     }
 
 
-    // row editing
+    // MARK: row editing
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return true
     }
 
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            print("tableView:commitEditingStyle:forRowAtIndexPath[\(indexPath.row)]")
+            print("tableView:commitEditingStyle:[Delete]forRowAtIndexPath[\(indexPath.row)]")
             let item = self.fetchedResultsController.objectAtIndexPath(indexPath) as! ListItem
             model.removeItem(item)
         }
