@@ -78,7 +78,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     @IBAction func tapRemoveListButton(sender: AnyObject) {
-        if self.editing {
+        if tableView.editing {
             removeList()
         }
     }
