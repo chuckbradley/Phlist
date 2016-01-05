@@ -293,8 +293,13 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         itemsReordered = true
         if var items = fetchedResultsController.fetchedObjects as? [ListItem] {
             let itemToMove = fetchedResultsController.objectAtIndexPath(fromIndexPath) as! ListItem
-            items.removeAtIndex(fromIndexPath.row)
-            items.insert(itemToMove, atIndex: toIndexPath.row)
+            // use rowOffset to reflect item position if not in first section
+            var rowOffset = 0
+            if fromIndexPath.section == 1 {
+                rowOffset = self.fetchedResultsController.sections![0].numberOfObjects
+            }
+            items.removeAtIndex(fromIndexPath.row + rowOffset)
+            items.insert(itemToMove, atIndex: toIndexPath.row + rowOffset)
             for (index, item) in items.enumerate() {
                 item.position = items.count - index - 1
             }
