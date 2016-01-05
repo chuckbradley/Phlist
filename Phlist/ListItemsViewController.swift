@@ -329,6 +329,21 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     func toggleItemActivation(item: ListItem) {
         item.active = !item.active
         item.updateModificationDate()
+        // update position values
+        itemsReordered = true
+        if var items = fetchedResultsController.fetchedObjects as? [ListItem] {
+            let firstSectionCount = self.fetchedResultsController.sections![0].numberOfObjects
+            let fromIndex = items.count - item.position - 1
+            var toIndex = firstSectionCount
+            if !item.active { toIndex-- }
+
+            items.removeAtIndex(fromIndex)
+            items.insert(item, atIndex: toIndex)
+
+            for (index, item) in items.enumerate() {
+                item.position = items.count - index - 1
+            }
+        }
         self.model.save()
         if let pfItem = item.cloudObject {
             pfItem["active"] = item.active
