@@ -17,6 +17,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
 
     @IBOutlet var listTable: UITableView!
     @IBOutlet weak var logoutButton: UIBarButtonItem!
+    @IBOutlet weak var editButton: UIBarButtonItem!
 
 
     // MARK: - Lifecycle Methods
@@ -24,8 +25,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     override func viewDidLoad() {
         super.viewDidLoad()
         firstAppearance = true
-
-        self.navigationItem.leftBarButtonItem = self.editButtonItem()
 
         let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "tapAddButton:")
         self.navigationItem.rightBarButtonItem = addButton
@@ -64,12 +63,21 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         addNewList()
     }
 
-    // TODO: add condition for cloudless (navigate to welcome screen)
     @IBAction func tapLogoutButton(sender: AnyObject) {
         if model.isClouded {
             model.logout(self)
         } else {
             performSegueWithIdentifier("showSignupFromAllLists", sender: self)
+        }
+    }
+
+    @IBAction func tapEditButton(sender: UIBarButtonItem) {
+        if self.editing {
+            self.editing = false
+            editButton.title = "Edit"
+        } else {
+            self.editing = true
+            editButton.title = "Done"
         }
     }
 
@@ -258,9 +266,6 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
         let list = self.fetchedResultsController.objectAtIndexPath(indexPath) as! List
         cell.textLabel!.text = list.title
-        if !model.isClouded { // hide the detail button if not clouded
-            cell.accessoryType = .DisclosureIndicator
-        }
         setFontName("OpenSans", forView: cell.textLabel!, andSubViews: false)
     }
 

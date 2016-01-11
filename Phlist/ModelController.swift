@@ -904,6 +904,7 @@ class ModelController {
         cloudItem["active"] = item.active
         cloudItem["hasPhoto"] = item.hasPhoto
         cloudItem["photoFilename"] = item.photoFilename
+        cloudItem["position"] = item.position
         if item.hasPhoto && item.photoImageData != nil {
             cloudItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
         }
@@ -1198,6 +1199,7 @@ class ModelController {
         cloudItem["active"] = item.active
         cloudItem["hasPhoto"] = item.hasPhoto
         cloudItem["photoFilename"] = item.photoFilename
+        cloudItem["position"] = item.position
         if item.hasPhoto && item.photoImageData != nil {
             cloudItem["photo"] = PFFile(name: item.photoFilename, data: item.photoImageData!)
         }
@@ -1221,6 +1223,7 @@ class ModelController {
         item.searchText = item.name.lowercaseString
         item.active = cloudItem["active"] as! Bool
         item.hasPhoto = cloudItem["hasPhoto"] as! Bool
+        item.position = cloudItem["position"] as! Int
 
         if item.hasPhoto {
             if let pfPhotoFilename = cloudItem["photoFilename"] as? String {
@@ -1288,5 +1291,25 @@ class ModelController {
         }
     }
 
+    func applyPositionChangesForItems(items:[ListItem]) {
+        save()
+        var cloudItemsToUpdate = [PFObject]()
+        for item in items {
+//            print("[\(item.name)].position = \(item.position) and oldPosition = \(item.oldPosition)")
+            if item.position != item.oldPosition {
+                item.updateModificationDate()
+                if item.cloudObject != nil {
+                    item.cloudObject!["position"] = item.position
+//                    let cname = item.cloudObject!["name"]
+//                    let cpos = item.cloudObject!["position"]
+//                    print("cloudItem\(cname).position = \(cpos)")
+                    cloudItemsToUpdate.append(item.cloudObject!)
+                }
+                item.oldPosition = item.position
+            }
+        }
+//        print("cloudItemsToUpdate.count = \(cloudItemsToUpdate.count)")
+        PFObject.saveAllInBackground(cloudItemsToUpdate)
+    }
 
 }
