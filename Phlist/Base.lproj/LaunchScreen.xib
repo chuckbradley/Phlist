@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -11,20 +11,18 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="phlist-icon-grey" translatesAutoresizingMaskIntoConstraints="NO" id="loo-p2-Qdl">
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="phlist_large_grey" translatesAutoresizingMaskIntoConstraints="NO" id="J20-DR-74z">
                     <rect key="frame" x="8" y="100" width="464" height="140"/>
-                    <animations/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="140" id="0hJ-6I-uNw"/>
+                        <constraint firstAttribute="height" constant="140" id="pNX-XN-9PJ"/>
                     </constraints>
                 </imageView>
             </subviews>
-            <animations/>
             <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="loo-p2-Qdl" secondAttribute="trailing" constant="8" id="DQD-6N-2Rl"/>
-                <constraint firstItem="loo-p2-Qdl" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="b0c-yg-iHW"/>
-                <constraint firstItem="loo-p2-Qdl" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="-70" id="wzk-HU-CcO"/>
+                <constraint firstItem="J20-DR-74z" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="BL5-WF-wwO"/>
+                <constraint firstItem="J20-DR-74z" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="-70" id="gae-M3-u3E"/>
+                <constraint firstAttribute="trailing" secondItem="J20-DR-74z" secondAttribute="trailing" constant="8" id="zXa-01-uzz"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -32,6 +30,6 @@
         </view>
     </objects>
     <resources>
-        <image name="phlist-icon-grey" width="180" height="180"/>
+        <image name="phlist_large_grey" width="750" height="750"/>
     </resources>
 </document>
