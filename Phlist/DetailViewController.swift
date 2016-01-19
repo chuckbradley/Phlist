@@ -10,7 +10,7 @@ import AVFoundation
 import UIKit
 import MobileCoreServices
 
-class DetailViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class DetailViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     let model = ModelController.one
     let maxLargePhotoSize:CGFloat = 1334.0 // physical pixels for 6 (portrait height), 6 Plus would be 1920.0
     let maxSmallPhotoSize:CGFloat = 750.0 // physical pixels for 6 (portrait width), 6 Plus would be 1080.0
@@ -56,20 +56,7 @@ class DetailViewController: UIViewController, UIImagePickerControllerDelegate, U
     // MARK: - actions
 
     @IBAction func tapChangeButton(sender: AnyObject) {
-        textField.resignFirstResponder()
-
-        var text = ""
-        if textField.text != nil {
-            text = textField.text!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        }
-
-        if text.isEmpty {
-            text = listItem.name
-        } else if text != listItem.name {
-            model.changeNameOfItem(listItem, toName: text)
-        }
-        textField.text = text
-        self.title = text
+        editTitleText()
     }
 
 
@@ -91,6 +78,28 @@ class DetailViewController: UIViewController, UIImagePickerControllerDelegate, U
 
     func tapAway(recognizer: UITapGestureRecognizer) {
         self.view.endEditing(true)
+    }
+
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        editTitleText()
+        return true
+    }
+
+    func editTitleText() {
+        textField.resignFirstResponder()
+
+        var text = ""
+        if textField.text != nil {
+            text = textField.text!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+        }
+
+        if text.isEmpty {
+            text = listItem.name
+        } else if text != listItem.name {
+            model.changeNameOfItem(listItem, toName: text)
+        }
+        textField.text = text
+        self.title = text
     }
 
 
