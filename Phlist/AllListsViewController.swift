@@ -26,12 +26,12 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         super.viewDidLoad()
         firstAppearance = true
 
-        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "tapAddButton:")
+        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(AllListsViewController.tapAddButton(_:)))
         self.navigationItem.rightBarButtonItem = addButton
 
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
 
-        self.refreshControl!.addTarget(self, action: "pulledTable:", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl!.addTarget(self, action: #selector(AllListsViewController.pulledTable(_:)), forControlEvents: UIControlEvents.ValueChanged)
 
         buildListAdditionUI()
         if !model.isClouded {
@@ -309,7 +309,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
         addNewListButton!.setTitle("Add", forState: UIControlState.Normal)
         addNewListButton!.frame = CGRectMake(view.bounds.width-62, 12, 50, 30)
         addNewListButton!.setTitleColor(UIColor.whiteColor(), forState: .Normal)
-        addNewListButton!.addTarget(self, action: "tapAddNewListButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        addNewListButton!.addTarget(self, action: #selector(AllListsViewController.tapAddNewListButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
 
         // add field and button to panel and panel to parent view
         listAdditionPanel!.addSubview(newListNameField!)
@@ -338,7 +338,7 @@ class AllListsViewController: UITableViewController, NSFetchedResultsControllerD
             },
             completion: {
                 _ in
-                self.dismissalPanel!.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissListAdditionPanel"))
+                self.dismissalPanel!.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(AllListsViewController.dismissListAdditionPanel)))
                 self.newListNameField?.becomeFirstResponder()
 
         })

@@ -34,7 +34,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         super.viewDidLoad()
 
         // navigation & toolbar:
-        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "tapPlusButton:")
+        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(ListItemsViewController.tapPlusButton(_:)))
         self.navigationItem.rightBarButtonItem = addButton
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
@@ -44,7 +44,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
 
         self.refreshControl = UIRefreshControl()
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
-        self.refreshControl.addTarget(self, action: "pulledTable:", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl.addTarget(self, action: #selector(ListItemsViewController.pulledTable(_:)), forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
 
         fetchedResultsController.delegate = self
@@ -335,7 +335,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
             let firstSectionCount = self.fetchedResultsController.sections![0].numberOfObjects
             let fromIndex = items.count - item.position - 1
             var toIndex = firstSectionCount
-            if !item.active { toIndex-- }
+            if !item.active { toIndex -= 1 }
 
             items.removeAtIndex(fromIndex)
             items.insert(item, atIndex: toIndex)
@@ -473,7 +473,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         addNewItemButton!.setTitle("Add", forState: UIControlState.Normal)
         addNewItemButton!.frame = CGRectMake(view.bounds.width-62, 12, 50, 30)
         addNewItemButton!.setTitleColor(UIColor.whiteColor(), forState: .Normal)
-        addNewItemButton!.addTarget(self, action: "tapAddNewItemButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        addNewItemButton!.addTarget(self, action: #selector(ListItemsViewController.tapAddNewItemButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
         // add field and button to panel and panel to parent view
         itemAdditionPanel!.addSubview(newItemNameField!)
@@ -481,7 +481,7 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         self.view.addSubview(itemAdditionPanel!)
         
         // define gesture recognizer for dismissal of panel
-        itemAdditionPanelDismisser = UITapGestureRecognizer(target: self, action: "dismissItemAdditionPanel")
+        itemAdditionPanelDismisser = UITapGestureRecognizer(target: self, action: #selector(ListItemsViewController.dismissItemAdditionPanel))
         
     }
     

@@ -28,7 +28,7 @@ class PasswordResetViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         emailField.attributedPlaceholder = NSAttributedString(string:"email",
             attributes:[NSForegroundColorAttributeName: UIColor.whiteColor()])
-        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
+        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: #selector(PasswordResetViewController.tapAway(_:)))
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
     }

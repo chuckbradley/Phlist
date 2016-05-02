@@ -184,7 +184,6 @@
 				B81EC7CF1B52F2D900D04A0A /* Frameworks */,
 				B81EC7A51B52EBB400D04A0A /* Phlist */,
 				B81EC7C01B52EBB400D04A0A /* PhlistTests */,
-				B81EC7A41B52EBB400D04A0A /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -195,6 +194,7 @@
 				B81EC7BD1B52EBB400D04A0A /* PhlistTests.xctest */,
 			);
 			name = Products;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		B81EC7A51B52EBB400D04A0A /* Phlist */ = {
@@ -203,6 +203,7 @@
 				B8176F621B62C4F900DB8556 /* View */,
 				B8176F581B5C271E00DB8556 /* Model */,
 				B8176F5D1B5C585A00DB8556 /* Util */,
+				B81EC7A41B52EBB400D04A0A /* Products */,
 				B81EC7A61B52EBB400D04A0A /* Supporting Files */,
 			);
 			path = Phlist;

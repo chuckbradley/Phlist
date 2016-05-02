@@ -35,7 +35,7 @@ class Connectivity: NSObject {
 
         // observe kReachabilityChangedNotification (defined in Reachability.h)
         NSNotificationCenter.defaultCenter().addObserver(self,
-            selector: "reachabilityChanged:",
+            selector: #selector(Connectivity.reachabilityChanged(_:)),
             name: kReachabilityChangedNotification,
             object: nil)
     }

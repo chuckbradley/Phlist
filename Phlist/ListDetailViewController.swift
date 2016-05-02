@@ -39,7 +39,7 @@ class ListDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         usersTable.delegate = self
         inviteesTable.delegate = self
 
-        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
+        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: #selector(ListDetailViewController.tapAway(_:)))
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
         setFontName("Menlo-Regular", forView: emailField, andSubViews: false)

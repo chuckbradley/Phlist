@@ -38,8 +38,8 @@ class DetailViewController: UIViewController, UIImagePickerControllerDelegate, U
         setFontName("OpenSans", forView: self.view, andSubViews: true)
         setFontName("Menlo-Regular", forView: textField, andSubViews: false)
 
-        tapImageRecognizer = UITapGestureRecognizer(target: self, action: "tapImage:")
-        tapViewRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
+        tapImageRecognizer = UITapGestureRecognizer(target: self, action: #selector(DetailViewController.tapImage(_:)))
+        tapViewRecognizer = UITapGestureRecognizer(target: self, action: #selector(DetailViewController.tapAway(_:)))
     }
 
     override func viewWillAppear(animated: Bool) {

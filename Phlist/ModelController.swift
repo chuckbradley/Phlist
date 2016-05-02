@@ -739,7 +739,7 @@ class ModelController {
         let title = invitations.count > 1 ? "New Lists" : "New List"
         var message = "Would you like to share the list"
         message += invitations.count > 1 ? "s \"" : " \""
-        for (var i=0; i < invitations.count; i++) {
+        for i in 0 ..< invitations.count {
             message += invitations[i]["title"] as! String
             if i == invitations.count-1 { message += "\"?" }
             else if invitations.count == 2 { message += "\" and \"" }

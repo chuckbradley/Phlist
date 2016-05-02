@@ -31,7 +31,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         passwordField.attributedPlaceholder = NSAttributedString(string:"password",
             attributes:[NSForegroundColorAttributeName: UIColor.whiteColor()])
         
-        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: "tapAway:")
+        tapAwayRecognizer = UITapGestureRecognizer(target: self, action: #selector(LoginViewController.tapAway(_:)))
 
         setFontName("OpenSans", forView: self.view, andSubViews: true)
 
