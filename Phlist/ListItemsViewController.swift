@@ -63,11 +63,16 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         selectedItem = nil
-        do {
-            try fetchedResultsController.performFetch()
-            tableView.reloadData()
-        } catch _ {
+
+        model.syncItemsInList(list) {
+            success, error in
+            do {
+                try self.fetchedResultsController.performFetch()
+                self.tableView.reloadData()
+            } catch _ {
+            }
         }
+
     }
 
 
@@ -326,41 +331,71 @@ class ListItemsViewController: UIViewController, UITableViewDelegate, UITableVie
         toggleItemActivation(item)
     }
 
+
+    // set position attribute only if two sections already exist
+    // ignore index since sorting predicate handles that
     func toggleItemActivation(item: ListItem) {
-        item.active = !item.active
-        item.updateModificationDate()
-        // update position values
-        itemsReordered = true
-        if var items = fetchedResultsController.fetchedObjects as? [ListItem] {
-            let firstSectionCount = self.fetchedResultsController.sections![0].numberOfObjects
-            let fromIndex = items.count - item.position - 1
-            var toIndex = firstSectionCount
-            if !item.active { toIndex -= 1 }
 
-            items.removeAtIndex(fromIndex)
-            items.insert(item, atIndex: toIndex)
+        if let fetchedItems = fetchedResultsController.fetchedObjects as? [ListItem] {
 
-            for (index, item) in items.enumerate() {
-                item.position = items.count - index - 1
+            // filter items by section without subject item:
+            let activeItems = fetchedItems.filter() {
+                return $0.active && $0 != item
             }
-        }
-        self.model.save()
-        if let pfItem = item.cloudObject {
-            pfItem["active"] = item.active
-            pfItem.saveInBackgroundWithBlock{
-                success, error in
-                if success {
-                    item.updateSynchronizationDate()
-                    self.model.save()
+
+            let archivedItems = fetchedItems.filter() {
+                return !$0.active && $0 != item
+            }
+
+            // check if two sections already exist 
+            // (if not, moved item will create new section and be automatically positioned correctly)
+            let alreadyTwoSections = activeItems.count > 0 && archivedItems.count > 0
+
+            // set item position values:
+            for (index, itm) in activeItems.enumerate() {
+                itm.oldPosition = itm.position
+                if alreadyTwoSections {
+                    itm.position = fetchedItems.count - index - 1
                 }
             }
+
+            for (index, itm) in archivedItems.enumerate() {
+                itm.oldPosition = itm.position
+                if alreadyTwoSections {
+                    itm.position = fetchedItems.count - activeItems.count - index - 2
+                }
+            }
+
+            item.oldPosition = item.position
+            if alreadyTwoSections {
+                item.position = fetchedItems.count - activeItems.count - 1
+            }
+
+            // toggle active status:
+            item.active = !item.active
+            item.updateModificationDate()
+
+            // save active status in cloud:
+            if let cloudItem = item.cloudObject {
+                cloudItem["active"] = item.active
+                cloudItem.saveInBackgroundWithBlock{
+                    success, error in
+                    if success {
+                        item.updateSynchronizationDate()
+                        self.model.save()
+                    }
+                }
+            }
+
+            // save position values in cloud:
+            model.applyPositionChangesForItems(fetchedItems)
         }
     }
-    
+
     func listItemCellThumbnailTapped(item: ListItem) {
         selectedItem = item
         model.loadCloudItemForListItem(item) {
-            pfItem, error in
+            cloudItem, error in
             if error != nil {
                 print("thumbnailTapped error = \(error!.description)")
             }

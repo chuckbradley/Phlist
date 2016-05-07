@@ -1224,6 +1224,7 @@ class ModelController {
         item.active = cloudItem["active"] as! Bool
         item.hasPhoto = cloudItem["hasPhoto"] as! Bool
         item.position = cloudItem["position"] as! Int
+        item.oldPosition = item.position
 
         if item.hasPhoto {
             if let pfPhotoFilename = cloudItem["photoFilename"] as? String {
@@ -1304,6 +1305,8 @@ class ModelController {
 //                    let cpos = item.cloudObject!["position"]
 //                    print("cloudItem\(cname).position = \(cpos)")
                     cloudItemsToUpdate.append(item.cloudObject!)
+                } else {
+                    print("no cloudObject for \(item.name)")
                 }
                 item.oldPosition = item.position
             }
