@@ -551,10 +551,10 @@ class ModelController {
             let query = PFQuery(className:"List")
             query.whereKey("editors", equalTo: user!.email!)
             query.findObjectsInBackgroundWithBlock {
-                (objects: [AnyObject]?, error: NSError?) -> Void in
+                (objects: [PFObject]?, error: NSError?) -> Void in
                 if error == nil {
                     // println("retrieved \(objects!.count) lists from cloud")
-                    if let objects = objects as? [PFObject] {
+                    if let objects = objects {
                         handler(lists: objects, error: nil)
                     }
                 } else {
@@ -1076,9 +1076,9 @@ class ModelController {
                 query.whereKey("editors", equalTo: user!.email!)
             }
             query.findObjectsInBackgroundWithBlock {
-                (objects: [AnyObject]?, error: NSError?) -> Void in
+                (objects: [PFObject]?, error: NSError?) -> Void in
                 if error == nil {
-                    if let cloudItems = objects as? [PFObject] {
+                    if let cloudItems = objects {
                         handler(items: cloudItems, error: nil)
                     } else {
                         handler(items: [PFObject](), error: nil)

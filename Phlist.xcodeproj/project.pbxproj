@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		33FFADBD5C4470EE01E4571D /* Pods_Phlist.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0A491C19147D503625353E0 /* Pods_Phlist.framework */; };
 		B8176F531B5C26DB00DB8556 /* List.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8176F521B5C26DB00DB8556 /* List.swift */; };
 		B8176F551B5C26EF00DB8556 /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8176F541B5C26EF00DB8556 /* ListItem.swift */; };
 		B8176F5A1B5C4E4600DB8556 /* ImageDataCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8176F591B5C4E4600DB8556 /* ImageDataCache.swift */; };
@@ -22,19 +23,8 @@
 		B81EC7B51B52EBB400D04A0A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B81EC7B41B52EBB400D04A0A /* Images.xcassets */; };
 		B81EC7B81B52EBB400D04A0A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B81EC7B61B52EBB400D04A0A /* LaunchScreen.xib */; };
 		B81EC7C41B52EBB400D04A0A /* PhlistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81EC7C31B52EBB400D04A0A /* PhlistTests.swift */; };
-		B81EC7D21B52F31400D04A0A /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D01B52F31400D04A0A /* Bolts.framework */; };
-		B81EC7D31B52F31400D04A0A /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D11B52F31400D04A0A /* Parse.framework */; };
-		B81EC7DF1B52F43800D04A0A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D41B52F43800D04A0A /* AudioToolbox.framework */; };
-		B81EC7E01B52F43800D04A0A /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D51B52F43800D04A0A /* CFNetwork.framework */; };
-		B81EC7E11B52F43800D04A0A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D61B52F43800D04A0A /* CoreGraphics.framework */; };
-		B81EC7E21B52F43800D04A0A /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D71B52F43800D04A0A /* CoreLocation.framework */; };
-		B81EC7E31B52F43800D04A0A /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D81B52F43800D04A0A /* libsqlite3.0.dylib */; };
-		B81EC7E41B52F43800D04A0A /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7D91B52F43800D04A0A /* libz.dylib */; };
-		B81EC7E51B52F43800D04A0A /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DA1B52F43800D04A0A /* MobileCoreServices.framework */; };
-		B81EC7E61B52F43800D04A0A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DB1B52F43800D04A0A /* QuartzCore.framework */; };
-		B81EC7E71B52F43800D04A0A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DC1B52F43800D04A0A /* Security.framework */; };
-		B81EC7E91B52F43800D04A0A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B81EC7DE1B52F43800D04A0A /* SystemConfiguration.framework */; };
 		B82E59911BBC42500013B50B /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82E59901BBC42500013B50B /* Shared.swift */; };
+		B839BB941D04D06100918389 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = B839BB931D04D06100918389 /* Podfile */; };
 		B862795E1B754C08008022B7 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = B862795D1B754C08008022B7 /* Reachability.m */; };
 		B86279601B765EE1008022B7 /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B862795F1B765EE1008022B7 /* Connectivity.swift */; };
 		B8660ECC1B76BF4A00404010 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8660ECB1B76BF4A00404010 /* LoadingViewController.swift */; };
@@ -48,6 +38,7 @@
 		B89993D11B817A1A006FDD82 /* ActiveListItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89993D01B817A1A006FDD82 /* ActiveListItemCell.swift */; };
 		B89993D31B8AA7C0006FDD82 /* ListItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89993D21B8AA7C0006FDD82 /* ListItemCell.swift */; };
 		B8A3FD941BBF265100A161E8 /* PasswordResetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A3FD931BBF265100A161E8 /* PasswordResetViewController.swift */; };
+		FEFC45809DB8276F45E069C5 /* Pods_PhlistTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BE97EB95765ADFB22C86EBA /* Pods_PhlistTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +52,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2EC881780DE427225A5CA1EC /* Pods-Phlist.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Phlist.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Phlist/Pods-Phlist.debug.xcconfig"; sourceTree = "<group>"; };
+		3080207ADFDE4073E654A9E9 /* Pods-PhlistTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhlistTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PhlistTests/Pods-PhlistTests.release.xcconfig"; sourceTree = "<group>"; };
+		4017C28C22FA61A5F3C14D5B /* Pods-Phlist.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Phlist.release.xcconfig"; path = "Pods/Target Support Files/Pods-Phlist/Pods-Phlist.release.xcconfig"; sourceTree = "<group>"; };
+		4CC9048661A6FACBB0DE6AE5 /* Pods-PhlistTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhlistTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PhlistTests/Pods-PhlistTests.debug.xcconfig"; sourceTree = "<group>"; };
+		9BE97EB95765ADFB22C86EBA /* Pods_PhlistTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhlistTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8176F521B5C26DB00DB8556 /* List.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = List.swift; sourceTree = "<group>"; };
 		B8176F541B5C26EF00DB8556 /* ListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
 		B8176F591B5C4E4600DB8556 /* ImageDataCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDataCache.swift; sourceTree = "<group>"; };
@@ -80,19 +76,8 @@
 		B81EC7BD1B52EBB400D04A0A /* PhlistTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhlistTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B81EC7C21B52EBB400D04A0A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B81EC7C31B52EBB400D04A0A /* PhlistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhlistTests.swift; sourceTree = "<group>"; };
-		B81EC7D01B52F31400D04A0A /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
-		B81EC7D11B52F31400D04A0A /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
-		B81EC7D41B52F43800D04A0A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		B81EC7D51B52F43800D04A0A /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		B81EC7D61B52F43800D04A0A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		B81EC7D71B52F43800D04A0A /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
-		B81EC7D81B52F43800D04A0A /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
-		B81EC7D91B52F43800D04A0A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		B81EC7DA1B52F43800D04A0A /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		B81EC7DB1B52F43800D04A0A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		B81EC7DC1B52F43800D04A0A /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		B81EC7DE1B52F43800D04A0A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		B82E59901BBC42500013B50B /* Shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
+		B839BB931D04D06100918389 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		B862795B1B754C07008022B7 /* Phlist-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Phlist-Bridging-Header.h"; sourceTree = "<group>"; };
 		B862795C1B754C08008022B7 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		B862795D1B754C08008022B7 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
@@ -108,6 +93,7 @@
 		B89993D01B817A1A006FDD82 /* ActiveListItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveListItemCell.swift; sourceTree = "<group>"; };
 		B89993D21B8AA7C0006FDD82 /* ListItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListItemCell.swift; sourceTree = "<group>"; };
 		B8A3FD931BBF265100A161E8 /* PasswordResetViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordResetViewController.swift; sourceTree = "<group>"; };
+		D0A491C19147D503625353E0 /* Pods_Phlist.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Phlist.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,18 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B81EC7DF1B52F43800D04A0A /* AudioToolbox.framework in Frameworks */,
-				B81EC7E01B52F43800D04A0A /* CFNetwork.framework in Frameworks */,
-				B81EC7E11B52F43800D04A0A /* CoreGraphics.framework in Frameworks */,
-				B81EC7E21B52F43800D04A0A /* CoreLocation.framework in Frameworks */,
-				B81EC7E31B52F43800D04A0A /* libsqlite3.0.dylib in Frameworks */,
-				B81EC7E41B52F43800D04A0A /* libz.dylib in Frameworks */,
-				B81EC7E51B52F43800D04A0A /* MobileCoreServices.framework in Frameworks */,
-				B81EC7E61B52F43800D04A0A /* QuartzCore.framework in Frameworks */,
-				B81EC7E71B52F43800D04A0A /* Security.framework in Frameworks */,
-				B81EC7E91B52F43800D04A0A /* SystemConfiguration.framework in Frameworks */,
-				B81EC7D31B52F31400D04A0A /* Parse.framework in Frameworks */,
-				B81EC7D21B52F31400D04A0A /* Bolts.framework in Frameworks */,
+				33FFADBD5C4470EE01E4571D /* Pods_Phlist.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,12 +109,33 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEFC45809DB8276F45E069C5 /* Pods_PhlistTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		03D19E99C9A2B5CD2EF6ED74 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D0A491C19147D503625353E0 /* Pods_Phlist.framework */,
+				9BE97EB95765ADFB22C86EBA /* Pods_PhlistTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		935FF3DE9ECAFCA5481BA3C9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2EC881780DE427225A5CA1EC /* Pods-Phlist.debug.xcconfig */,
+				4017C28C22FA61A5F3C14D5B /* Pods-Phlist.release.xcconfig */,
+				4CC9048661A6FACBB0DE6AE5 /* Pods-PhlistTests.debug.xcconfig */,
+				3080207ADFDE4073E654A9E9 /* Pods-PhlistTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		B8176F581B5C271E00DB8556 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,9 +177,11 @@
 		B81EC79A1B52EBB400D04A0A = {
 			isa = PBXGroup;
 			children = (
-				B81EC7CF1B52F2D900D04A0A /* Frameworks */,
+				B839BB931D04D06100918389 /* Podfile */,
 				B81EC7A51B52EBB400D04A0A /* Phlist */,
 				B81EC7C01B52EBB400D04A0A /* PhlistTests */,
+				935FF3DE9ECAFCA5481BA3C9 /* Pods */,
+				03D19E99C9A2B5CD2EF6ED74 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -239,25 +237,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B81EC7CF1B52F2D900D04A0A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				B81EC7D41B52F43800D04A0A /* AudioToolbox.framework */,
-				B81EC7D51B52F43800D04A0A /* CFNetwork.framework */,
-				B81EC7D61B52F43800D04A0A /* CoreGraphics.framework */,
-				B81EC7D71B52F43800D04A0A /* CoreLocation.framework */,
-				B81EC7D81B52F43800D04A0A /* libsqlite3.0.dylib */,
-				B81EC7D91B52F43800D04A0A /* libz.dylib */,
-				B81EC7DA1B52F43800D04A0A /* MobileCoreServices.framework */,
-				B81EC7DB1B52F43800D04A0A /* QuartzCore.framework */,
-				B81EC7DC1B52F43800D04A0A /* Security.framework */,
-				B81EC7DE1B52F43800D04A0A /* SystemConfiguration.framework */,
-				B81EC7D01B52F31400D04A0A /* Bolts.framework */,
-				B81EC7D11B52F31400D04A0A /* Parse.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		B8A3FD951BBF371100A161E8 /* Intro Interface */ = {
 			isa = PBXGroup;
 			children = (
@@ -289,9 +268,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B81EC7C71B52EBB400D04A0A /* Build configuration list for PBXNativeTarget "Phlist" */;
 			buildPhases = (
+				EDE3ACCE933833DDBE73CB57 /* [CP] Check Pods Manifest.lock */,
 				B81EC79F1B52EBB400D04A0A /* Sources */,
 				B81EC7A01B52EBB400D04A0A /* Frameworks */,
 				B81EC7A11B52EBB400D04A0A /* Resources */,
+				E39D350518FFC38FCBA29BDB /* [CP] Embed Pods Frameworks */,
+				31AB85916F89A52D5283A250 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -306,9 +288,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B81EC7CA1B52EBB400D04A0A /* Build configuration list for PBXNativeTarget "PhlistTests" */;
 			buildPhases = (
+				7D87D34420C4F79EC90A8CA1 /* [CP] Check Pods Manifest.lock */,
 				B81EC7B91B52EBB400D04A0A /* Sources */,
 				B81EC7BA1B52EBB400D04A0A /* Frameworks */,
 				B81EC7BB1B52EBB400D04A0A /* Resources */,
+				79F143EC00BD96BCE1CCB5AB /* [CP] Embed Pods Frameworks */,
+				A10EC83DA24B2A28BC2207F2 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -378,6 +363,7 @@
 				B81EC7B31B52EBB400D04A0A /* Main.storyboard in Resources */,
 				B81EC7B81B52EBB400D04A0A /* LaunchScreen.xib in Resources */,
 				B88E23671BBB96EC00D7F124 /* OpenSans-Light.ttf in Resources */,
+				B839BB941D04D06100918389 /* Podfile in Resources */,
 				B81EC7B51B52EBB400D04A0A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -390,6 +376,99 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		31AB85916F89A52D5283A250 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Phlist/Pods-Phlist-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		79F143EC00BD96BCE1CCB5AB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PhlistTests/Pods-PhlistTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7D87D34420C4F79EC90A8CA1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		A10EC83DA24B2A28BC2207F2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PhlistTests/Pods-PhlistTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E39D350518FFC38FCBA29BDB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Phlist/Pods-Phlist-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EDE3ACCE933833DDBE73CB57 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B81EC79F1B52EBB400D04A0A /* Sources */ = {
@@ -543,6 +622,7 @@
 		};
 		B81EC7C81B52EBB400D04A0A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2EC881780DE427225A5CA1EC /* Pods-Phlist.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -565,6 +645,7 @@
 		};
 		B81EC7C91B52EBB400D04A0A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4017C28C22FA61A5F3C14D5B /* Pods-Phlist.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -586,6 +667,7 @@
 		};
 		B81EC7CB1B52EBB400D04A0A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4CC9048661A6FACBB0DE6AE5 /* Pods-PhlistTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -606,6 +688,7 @@
 		};
 		B81EC7CC1B52EBB400D04A0A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3080207ADFDE4073E654A9E9 /* Pods-PhlistTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
